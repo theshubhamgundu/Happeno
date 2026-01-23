@@ -1,0 +1,20 @@
+{
+    "name": "Happeno",
+    "short_name": "Happeno",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#FFF3E6",
+    "theme_color": "#EC1C79",
+    "icons": [
+        {
+            "src": "/logo.jpeg",
+            "sizes": "192x192",
+            "type": "image/jpeg"
+        },
+        {
+            "src": "/logo.jpeg",
+            "sizes": "512x512",
+            "type": "image/jpeg"
+        }
+    ]
+}

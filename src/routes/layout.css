@@ -1,0 +1,55 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #EC1C79;
+  --color-primary-dark: #C51662;
+  --color-urgency: #FF9F1C;
+  --color-success: #22C55E;
+  --color-bg-app: #FFF3E6;
+  --color-surface: #FFFFFF;
+  --color-highlight: #FFE4EF;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #4A2F2F;
+  --color-text-muted: #7B4B5A;
+  --color-border-peach: #FFD6C9;
+  --color-input-rose: #F2B8C6;
+  
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+  --font-brand: 'Fredoka', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-app text-text-primary font-sans;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold;
+  }
+}
+
+@layer utilities {
+  .brand-text {
+    @apply font-brand text-primary;
+    letter-spacing: -0.02em;
+  }
+  
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20;
+  }
+  
+  .card-shadow {
+    box-shadow: 0 4px 20px -2px rgba(236, 28, 121, 0.1), 0 2px 10px -2px rgba(236, 28, 121, 0.05);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
