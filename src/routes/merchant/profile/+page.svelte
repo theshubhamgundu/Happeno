@@ -10,6 +10,15 @@
     Camera,
     Navigation,
     Clock,
+    Palette,
+    Moon,
+    HelpCircle,
+    MessageCircle,
+    MessageSquare,
+    Shield,
+    FileText,
+    Info,
+    ChevronRight,
   } from "lucide-svelte";
   import { goto } from "$app/navigation";
 
@@ -251,6 +260,129 @@
             </div>
           </div>
         {/if}
+      </div>
+    </div>
+
+    <!-- Appearance -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between px-1">
+        <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
+          <div class="p-1.5 rounded-lg bg-pink-50 text-pink-500">
+            <Palette size={18} />
+          </div>
+          Appearance
+        </h2>
+      </div>
+      <button
+        class="w-full bg-white p-5 rounded-[28px] border border-border-peach shadow-sm flex items-center justify-between hover:border-primary/50 transition-colors group"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="p-3 bg-slate-100 text-slate-600 rounded-2xl group-hover:bg-primary/10 group-hover:text-primary transition-colors"
+          >
+            <Moon size={20} />
+          </div>
+          <div class="font-bold text-text-primary">Theme</div>
+        </div>
+        <div class="flex items-center gap-2 text-text-muted font-bold text-sm">
+          Dark
+          <ChevronRight size={16} />
+        </div>
+      </button>
+    </div>
+
+    <!-- Support -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between px-1">
+        <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
+          <div class="p-1.5 rounded-lg bg-blue-50 text-blue-500">
+            <HelpCircle size={18} />
+          </div>
+          Support
+        </h2>
+      </div>
+      <div
+        class="bg-white rounded-[28px] border border-border-peach shadow-sm overflow-hidden flex flex-col"
+      >
+        <button
+          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors"
+        >
+          <div class="flex items-center gap-4">
+            <div class="p-2.5 bg-slate-100 text-slate-500 rounded-xl">
+              <HelpCircle size={18} />
+            </div>
+            <div class="font-bold text-text-primary text-sm">
+              Frequently asked questions
+            </div>
+          </div>
+          <ChevronRight size={18} class="text-slate-300" />
+        </button>
+        <button
+          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors"
+        >
+          <div class="flex items-center gap-4">
+            <div class="p-2.5 bg-slate-100 text-slate-500 rounded-xl">
+              <MessageCircle size={18} />
+            </div>
+            <div class="font-bold text-text-primary text-sm">Chat with us</div>
+          </div>
+          <ChevronRight size={18} class="text-slate-300" />
+        </button>
+        <button
+          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition-colors"
+        >
+          <div class="flex items-center gap-4">
+            <div class="p-2.5 bg-slate-100 text-slate-500 rounded-xl">
+              <MessageSquare size={18} />
+            </div>
+            <div class="font-bold text-text-primary text-sm">
+              Share feedback
+            </div>
+          </div>
+          <ChevronRight size={18} class="text-slate-300" />
+        </button>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between px-1">
+        <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
+          <div class="p-1.5 rounded-lg bg-slate-100 text-slate-500">
+            <Info size={18} />
+          </div>
+          About
+        </h2>
+      </div>
+      <div
+        class="bg-white rounded-[28px] border border-border-peach shadow-sm overflow-hidden flex flex-col"
+      >
+        <button
+          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors"
+        >
+          <div class="flex items-center gap-4">
+            <div class="p-2.5 bg-slate-100 text-slate-500 rounded-xl">
+              <Shield size={18} />
+            </div>
+            <div class="font-bold text-text-primary text-sm">
+              Privacy Policy
+            </div>
+          </div>
+          <ChevronRight size={18} class="text-slate-300" />
+        </button>
+        <button
+          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition-colors"
+        >
+          <div class="flex items-center gap-4">
+            <div class="p-2.5 bg-slate-100 text-slate-500 rounded-xl">
+              <FileText size={18} />
+            </div>
+            <div class="font-bold text-text-primary text-sm">
+              Terms of Service
+            </div>
+          </div>
+          <ChevronRight size={18} class="text-slate-300" />
+        </button>
       </div>
     </div>
 
