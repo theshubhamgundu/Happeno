@@ -1,0 +1,11 @@
+{
+    "version": 2,
+    "framework": "sveltekit",
+    "cleanUrls": true,
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/$1"
+        }
+    ]
+}
