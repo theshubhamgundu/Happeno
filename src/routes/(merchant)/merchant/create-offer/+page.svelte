@@ -1,163 +1,311 @@
 <script lang="ts">
-  import Input from '$lib/components/Input.svelte';
-  import Button from '$lib/components/Button.svelte';
-  import { ChevronLeft, MapPin, Zap, Clock } from 'lucide-svelte';
-  import { goto } from '$app/navigation';
-  import { cn } from '$lib/utils';
+  import Input from "$lib/components/Input.svelte";
+  import Button from "$lib/components/Button.svelte";
+  import {
+    ChevronLeft,
+    Gift,
+    Upload,
+    Image as ImageIcon,
+    IndianRupee,
+    Tag,
+    X,
+  } from "lucide-svelte";
+  import { goto } from "$app/navigation";
+  import { cn } from "$lib/utils";
 
-  let title = $state('');
-  let description = $state('');
-  let discount = $state('');
-  let radius = $state(1); // 1, 3, 5, 10
-  let duration = $state(2); // 2, 6, 12, 24
+  // Form State
+  let offerTitle = $state("");
+  let productName = $state("");
+  let originalPrice = $state("");
+  let discountedPrice = $state("");
+  let imageFile: File | null = $state(null);
+  let imagePreview: string | null = $state(null);
   let loading = $state(false);
+  let fileInput: HTMLInputElement;
 
-  const radiusOptions = [
-    { value: 1, label: '1 km', price: 50, reach: '~120 users' },
-    { value: 3, label: '3 km', price: 120, reach: '~500 users' },
-    { value: 5, label: '5 km', price: 200, reach: '~1200 users' },
-    { value: 10, label: '10 km', price: 500, reach: '~3500 users' },
-  ];
+  // Derived Values
+  let discountPercentage = $derived.by(() => {
+    const original = parseFloat(originalPrice);
+    const discounted = parseFloat(discountedPrice);
 
-  const durationOptions = [
-    { value: 2, label: '2 Hours', add: 0 },
-    { value: 6, label: '6 Hours', add: 0.2 },
-    { value: 12, label: '12 Hours', add: 0.4 },
-    { value: 24, label: '24 Hours', add: 0.6 },
-  ];
-
-  let totalPrice = $derived.by(() => {
-    const base = radiusOptions.find(r => r.value === radius)?.price || 0;
-    const multi = 1 + (durationOptions.find(d => d.value === duration)?.add || 0);
-    return Math.round(base * multi);
+    if (original > 0 && discounted >= 0 && original > discounted) {
+      const off = ((original - discounted) / original) * 100;
+      return Math.round(off) + "% OFF";
+    }
+    return "";
   });
 
-  async function handlePayment() {
-    if (!title || !discount) {
-      alert('Please fill at least the title and discount!');
+  function handleFileSelect(e: Event) {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files[0]) {
+      imageFile = target.files[0];
+      imagePreview = URL.createObjectURL(imageFile);
+    }
+  }
+
+  function removeImage() {
+    imageFile = null;
+    imagePreview = null;
+    if (fileInput) fileInput.value = "";
+  }
+
+  async function handlePublish() {
+    if (
+      !offerTitle ||
+      !productName ||
+      !originalPrice ||
+      !discountedPrice ||
+      !imageFile
+    ) {
+      alert("Please fill all details and upload an image!");
       return;
     }
 
     loading = true;
-    
-    // Simulate successful broadcast/payment
+
+    // Simulate API call
     setTimeout(() => {
       loading = false;
-      goto('/merchant/dashboard');
+      goto("/merchant/dashboard");
     }, 1500);
   }
 </script>
 
-<div class="min-h-screen bg-bg-app pb-24">
-  <header class="px-6 py-6 flex items-center gap-4 sticky top-0 bg-bg-app/80 backdrop-blur-xl z-30">
-    <button onclick={() => history.back()} class="p-3 bg-white border border-border-peach rounded-2xl text-text-primary">
+<div class="min-h-screen bg-bg-app pb-24 relative overflow-x-hidden">
+  <!-- Subtle Background Blobs -->
+  <div
+    class="fixed -top-32 -right-32 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"
+  ></div>
+  <div
+    class="fixed top-1/2 -left-32 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"
+  ></div>
+
+  <header
+    class="px-6 py-6 flex items-center gap-4 sticky top-0 bg-bg-app/80 backdrop-blur-xl z-30 transition-all duration-300"
+  >
+    <button
+      onclick={() => history.back()}
+      class="p-3 bg-white/50 border border-slate-100/50 backdrop-blur-md rounded-2xl text-text-primary hover:bg-white hover:shadow-sm transition-all active:scale-95"
+    >
       <ChevronLeft size={24} />
     </button>
-    <h1 class="text-2xl font-heading font-extrabold text-text-primary">New Broadcast</h1>
+    <h1
+      class="text-2xl font-heading font-extrabold text-text-primary tracking-tight"
+    >
+      New Offer
+    </h1>
   </header>
 
-  <main class="px-6 flex flex-col gap-8 mt-4">
-    <div class="space-y-6">
-      <div class="flex flex-col gap-4">
+  <main class="px-6 flex flex-col gap-8 mt-2 relative z-10">
+    <!-- Image Upload Section -->
+    <div
+      class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both"
+    >
+      <div class="flex items-center justify-between">
         <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
-          <Zap size={20} class="text-primary" /> Offer Details
+          <div class="p-1.5 rounded-lg bg-blue-50 text-blue-500">
+            <Gift size={18} />
+          </div>
+          Offer Visual
         </h2>
-        <Input label="Offer Title" placeholder="e.g. Flash 50% Off Everything" bind:value={title} />
-        <Input label="Discount Detail" placeholder="e.g. FLAT 50% OFF" bind:value={discount} />
-        <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-semibold text-text-secondary ml-1" for="desc">Description</label>
-          <textarea 
-            id="desc"
-            placeholder="Tell users more about this offer..."
-            class="w-full px-5 py-4 bg-white border-2 border-input-rose rounded-2xl outline-none focus:border-primary transition-all duration-300 min-h-[120px] font-medium"
-            bind:value={description}
-          ></textarea>
-        </div>
+        <span
+          class="text-[10px] font-bold uppercase tracking-widest text-text-muted bg-white/50 px-2 py-1 rounded-md"
+          >Step 1</span
+        >
       </div>
 
-      <div class="flex flex-col gap-4">
-        <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
-          <MapPin size={20} class="text-primary" /> Radius Coverage
-        </h2>
-        
-        <!-- Radius Preview Map Mock -->
-        <div class="h-48 w-full relative rounded-[32px] overflow-hidden border border-border-peach">
-          <div class="absolute inset-0 bg-[#f5f5f5] flex items-center justify-center">
-             <div class="w-2 h-2 bg-primary rounded-full relative z-10"></div>
-             <div 
-               class="border-2 border-primary bg-primary/10 rounded-full transition-all duration-500 flex items-center justify-center"
-               style="width: {radius * 20}px; height: {radius * 20}px;"
-             >
-               <span class="text-[8px] font-bold text-primary opacity-50">{radius}km</span>
-             </div>
-          </div>
-          <div class="absolute top-4 left-4 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-text-muted border border-border-peach">
-            LIVE PREVIEW
-          </div>
-        </div>
+      <input
+        type="file"
+        accept="image/*"
+        class="hidden"
+        bind:this={fileInput}
+        onchange={handleFileSelect}
+      />
 
-        <div class="grid grid-cols-2 gap-3">
-          {#each radiusOptions as option}
-            <button 
-              onclick={() => radius = option.value}
-              class={cn(
-                "p-4 rounded-3xl border-2 transition-all flex flex-col items-center gap-1",
-                radius === option.value 
-                  ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105" 
-                  : "bg-white text-text-primary border-border-peach hover:border-primary/50"
-              )}
+      {#if imagePreview}
+        <div
+          class="w-full aspect-video relative rounded-3xl overflow-hidden shadow-lg shadow-slate-200/50 animate-in zoom-in-95 duration-300"
+        >
+          <img
+            src={imagePreview}
+            alt="Preview"
+            class="w-full h-full object-cover"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"
+          ></div>
+
+          <button
+            onclick={removeImage}
+            class="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-xl text-white hover:bg-red-500 hover:text-white transition-colors"
+          >
+            <X size={20} />
+          </button>
+
+          <div class="absolute bottom-4 left-4 text-white">
+            <div
+              class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1"
             >
-              <span class="text-base font-extrabold">{option.label}</span>
-              <span class={cn("text-[10px] font-bold uppercase", radius === option.value ? "text-white/80" : "text-text-muted")}>
-                {option.reach}
-              </span>
-            </button>
-          {/each}
+              Preview
+            </div>
+            <div class="font-bold text-sm">Tap X to change</div>
+          </div>
         </div>
+      {:else}
+        <button
+          onclick={() => fileInput.click()}
+          class="w-full aspect-video bg-white/60 border-2 border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-primary/50 hover:bg-white hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group active:scale-[0.99]"
+        >
+          <div
+            class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300"
+          >
+            <Upload
+              size={28}
+              class="text-slate-400 group-hover:text-primary transition-colors"
+            />
+          </div>
+          <div class="text-center">
+            <div
+              class="text-base font-bold text-text-primary group-hover:text-primary transition-colors"
+            >
+              Upload Product Photo
+            </div>
+            <div class="text-xs font-medium text-text-muted mt-1">
+              Supports JPG, PNG up to 5MB
+            </div>
+          </div>
+        </button>
+      {/if}
+    </div>
+
+    <!-- Details Section -->
+    <div
+      class="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-500 delay-200 fill-mode-both"
+    >
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
+          <div class="p-1.5 rounded-lg bg-orange-50 text-orange-500">
+            <Tag size={18} />
+          </div>
+          Details
+        </h2>
+        <span
+          class="text-[10px] font-bold uppercase tracking-widest text-text-muted bg-white/50 px-2 py-1 rounded-md"
+          >Step 2</span
+        >
       </div>
 
-      <div class="flex flex-col gap-4">
+      <div class="grid gap-4">
+        <Input
+          label="Offer Headline"
+          placeholder="e.g. 50% Off Lunch Combo"
+          bind:value={offerTitle}
+        />
+        <Input
+          label="Item Name"
+          placeholder="e.g. Spicy Chicken Burger"
+          bind:value={productName}
+        />
+      </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <div
+      class="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-500 delay-300 fill-mode-both"
+    >
+      <div class="flex items-center justify-between">
         <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
-          <Clock size={20} class="text-primary" /> Duration
+          <div class="p-1.5 rounded-lg bg-green-50 text-green-500">
+            <IndianRupee size={18} />
+          </div>
+          Pricing
         </h2>
-        <div class="flex flex-wrap gap-2">
-          {#each durationOptions as option}
-            <button 
-              onclick={() => duration = option.value}
-              class={cn(
-                "px-5 py-3 rounded-2xl border-2 transition-all font-bold text-sm",
-                duration === option.value 
-                  ? "bg-primary text-white border-primary" 
-                  : "bg-white text-text-primary border-border-peach"
-              )}
+        <span
+          class="text-[10px] font-bold uppercase tracking-widest text-text-muted bg-white/50 px-2 py-1 rounded-md"
+          >Step 3</span
+        >
+      </div>
+
+      <div
+        class="p-5 bg-white rounded-3xl border border-slate-100 shadow-sm space-y-4"
+      >
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label
+              class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1"
+              for="original">Original</label
             >
-              {option.label}
-              {#if option.add > 0}
-                <span class="ml-1 opacity-70 underline decoration-2">+{option.add * 100}%</span>
-              {/if}
-            </button>
-          {/each}
+            <div class="relative group">
+              <div
+                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors"
+              >
+                <IndianRupee size={16} />
+              </div>
+              <input
+                id="original"
+                type="number"
+                placeholder="000"
+                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-primary/20 focus:shadow-lg focus:shadow-primary/5 transition-all font-bold text-lg text-slate-600"
+                bind:value={originalPrice}
+              />
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label
+              class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1"
+              for="discounted">New Price</label
+            >
+            <div class="relative group">
+              <div
+                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors"
+              >
+                <IndianRupee size={16} />
+              </div>
+              <input
+                id="discounted"
+                type="number"
+                placeholder="000"
+                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-primary/20 focus:shadow-lg focus:shadow-primary/5 transition-all font-bold text-lg text-primary"
+                bind:value={discountedPrice}
+              />
+            </div>
+          </div>
         </div>
+
+        {#if discountPercentage}
+          <div
+            class="p-4 bg-gradient-to-r from-success/10 to-transparent border-l-4 border-success rounded-r-xl flex items-center gap-3 animate-in slide-in-from-left-4 fade-in duration-300"
+          >
+            <div
+              class="w-8 h-8 rounded-full bg-success text-white flex items-center justify-center font-bold"
+            >
+              %
+            </div>
+            <div>
+              <div class="text-sm font-bold text-slate-700">Great Deal!</div>
+              <div class="text-xs text-slate-500 font-medium">
+                You are offering <span class="text-success font-black"
+                  >{discountPercentage}</span
+                >
+              </div>
+            </div>
+          </div>
+        {/if}
       </div>
     </div>
   </main>
 
-  <!-- Checkout Bar -->
-  <div class="fixed bottom-0 left-0 right-0 p-6 bg-white border-t border-border-peach flex flex-col gap-4 z-40 rounded-t-[40px] shadow-2xl">
-    <div class="flex items-center justify-between px-2">
-      <div class="flex flex-col">
-        <span class="text-xs font-bold text-text-muted uppercase tracking-widest">Total Price</span>
-        <span class="text-3xl font-heading font-extrabold text-text-primary">₹{totalPrice}</span>
-      </div>
-      <div class="text-right">
-        <span class="text-xs font-bold text-success uppercase tracking-widest">Expected Reach</span>
-        <div class="text-lg font-bold text-text-primary">
-          {radiusOptions.find(r => r.value === radius)?.reach.split(' ')[0]} Users
-        </div>
-      </div>
-    </div>
-    <Button onclick={handlePayment} {loading} class="w-full py-5 text-xl font-bold">
-      Pay & Broadcast Live
+  <!-- Publish Bar -->
+  <div
+    class="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-slate-100 z-40 rounded-t-[40px] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] animate-in slide-in-from-bottom-full duration-700 delay-500"
+  >
+    <Button
+      onclick={handlePublish}
+      {loading}
+      class="w-full py-4 text-lg font-bold shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-1 transition-all"
+    >
+      Publish Offer
     </Button>
   </div>
 </div>
