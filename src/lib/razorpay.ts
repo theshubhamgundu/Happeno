@@ -1,4 +1,4 @@
-import { PUBLIC_RAZORPAY_KEY_ID } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 
 export async function initializePayment(options: {
     amount: number;
@@ -8,7 +8,7 @@ export async function initializePayment(options: {
     onFailure?: (response: any) => void;
 }) {
     const settings = {
-        key: PUBLIC_RAZORPAY_KEY_ID,
+        key: env.PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
         amount: options.amount * 100, // in paise
         currency: "INR",
         name: "Happeno",

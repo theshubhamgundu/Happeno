@@ -3,6 +3,7 @@
   import Button from '$lib/components/Button.svelte';
   import { goto } from '$app/navigation';
   import { Bell, LogOut, Shield, ChevronRight, User as UserIcon } from 'lucide-svelte';
+  import { cn } from '$lib/utils';
 
   let notificationsEnabled = $state(true);
 
@@ -36,6 +37,7 @@
         </div>
         <button 
           onclick={() => notificationsEnabled = !notificationsEnabled}
+          aria-label="Toggle notifications"
           class={cn(
             "w-12 h-6 rounded-full p-1 transition-colors duration-300",
             notificationsEnabled ? "bg-primary" : "bg-border-peach"
@@ -69,7 +71,3 @@
 </div>
 
 <BottomNav />
-
-<script context="module">
-  import { cn } from '$lib/utils';
-</script>
