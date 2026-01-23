@@ -7,11 +7,27 @@
     ChevronRight, 
     Star,
     ChevronDown,
-    CircleUser
+    CircleUser,
+    Bell
   } from 'lucide-svelte';
   import { cn } from '$lib/utils';
 
   let activeTab = $state<'online' | 'dineout'>('online');
+  let locationName = $state('Hyderabad');
+  let locationAddress = $state('Select Location');
+
+  onMount(() => {
+    const saved = localStorage.getItem('userLocation');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        locationName = data.name || 'Current Location';
+        locationAddress = data.address || 'Unknown Address';
+      } catch (e) {
+        console.error('Failed to parse location', e);
+      }
+    }
+  });
   
   const foodCategories = [
     { name: 'Biryani', image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&q=80' },
@@ -118,32 +134,46 @@
 
 <div class="min-h-screen bg-bg-app pb-32 text-text-primary">
   <!-- Header -->
-  <header class="px-6 pt-8 pb-4 flex flex-col gap-4 sticky top-0 bg-bg-app/95 backdrop-blur-xl z-30 border-b border-border-dark/50">
-    <div class="flex items-center justify-between">
-      <button class="flex items-center gap-2 group text-left">
-        <MapPin size={20} class="text-primary" />
-        <div>
+  <header class="sticky top-0 bg-bg-app/95 backdrop-blur-xl z-30 border-b border-border-dark/30">
+    <!-- Top Row: Logo, Location, Icons -->
+    <!-- Top Row: Logo, Location, Icons -->
+    <div class="px-1 py-2 flex items-center justify-between gap-1">
+      <!-- Left: Logo & Location -->
+      <a href="/user/onboarding" class="flex items-center gap-1 flex-1 min-w-0 active:opacity-70 transition-opacity">
+        <!-- Logo -->
+        <!-- Logo -->
+        <div class="w-12 h-12 shrink-0 ml-1">
+          <img src="/logo.png" alt="Happeno" class="w-full h-full object-contain" />
+        </div>
+        
+        <!-- Location Info -->
+        <div class="flex flex-col flex-1 min-w-0">
           <div class="flex items-center gap-1">
-            <span class="text-sm font-bold">You are in Hyderabad!</span>
+            <h2 class="text-base font-black text-text-primary leading-none">{locationName}</h2>
+            <ChevronDown size={16} class="text-text-primary" />
           </div>
-          <p class="text-[10px] text-text-muted font-medium flex items-center gap-1">
-            Setup your precise location <ChevronRight size={12} />
+          <p class="text-xs text-text-muted font-medium truncate w-full">
+            {locationAddress}
           </p>
         </div>
-      </button>
-      <a href="/user/profile" class="p-2 bg-surface border border-border-dark rounded-full shadow-sm">
-         <CircleUser size={24} class="text-text-muted" />
       </a>
+
+      <!-- Right: Icons -->
+      <div class="flex items-center gap-3 shrink-0">
+        <!-- Search Button -->
+        <a href="/user/search" class="w-10 h-10 bg-surface rounded-full flex items-center justify-center shadow-sm border border-border-dark text-text-primary">
+          <Search size={20} />
+        </a>
+        <!-- Profile Button -->
+        <a href="/user/profile" class="w-10 h-10 bg-surface rounded-full flex items-center justify-center shadow-sm border border-border-dark text-text-primary">
+           <CircleUser size={20} />
+        </a>
+      </div>
     </div>
 
-    <!-- Search Bar -->
-    <div class="relative">
-      <input 
-        placeholder="Search for restaurants & offers" 
-        class="w-full pl-4 pr-12 py-4 bg-surface border border-border-dark rounded-2xl text-sm font-medium outline-none focus:border-primary/50 transition-all placeholder:text-text-muted shadow-sm"
-      />
-      <Search size={20} class="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted" />
-    </div>
+    <!-- Sub-Header Search Bar (Optional, keeping for UX but styled minimally if desired, or relying on the Search Icon above) -->
+    <!-- Based on image, search is an icon. I will hide the big bar inside this header to match the image strictly. 
+         Users can click the search icon to search. -->
   </header>
 
   <main class="px-6 space-y-10 pt-6">
@@ -170,17 +200,17 @@
     <!-- What's on your mind? -->
     <section class="space-y-5">
       <h3 class="text-xl font-black text-text-primary">What's on your mind?</h3>
-      <div class="grid grid-cols-6 gap-x-2 gap-y-4 overflow-x-auto no-scrollbar">
+      <div class="flex gap-6 overflow-x-auto no-scrollbar pb-2 -mx-6 px-6">
         {#each foodCategories as cat}
-          <button class="flex flex-col items-center gap-2 group">
-            <div class="w-16 h-16 rounded-full overflow-hidden shadow-md group-hover:scale-110 transition-transform group-hover:shadow-lg bg-surface-lighter">
+          <button class="flex flex-col items-center gap-3 group flex-shrink-0">
+            <div class="w-20 h-20 rounded-full overflow-hidden shadow-lg group-hover:scale-105 transition-transform group-hover:shadow-xl border-2 border-white">
               <img 
                 src={cat.image} 
                 alt={cat.name} 
                 class="w-full h-full object-cover"
               />
             </div>
-            <span class="text-[10px] font-bold text-text-secondary text-center">{cat.name}</span>
+            <span class="text-xs font-semibold text-text-secondary text-center whitespace-nowrap">{cat.name}</span>
           </button>
         {/each}
       </div>
@@ -189,8 +219,8 @@
 
     <!-- Restaurants With Best Offers -->
     <section class="space-y-5">
-      <h3 class="text-xl font-black text-text-primary">🔥 Best Offers Near You</h3>
-      <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+      <h3 class="text-xl font-black text-text-primary">🔥 Exclusive Offers Near You</h3>
+      <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-6 px-6">
         {#each featuredRestaurants as restaurant}
           <a href="/restaurant/{restaurant.name}" class="flex-shrink-0 w-44 group">
             <div class="relative aspect-square rounded-[24px] overflow-hidden border border-border-dark shadow-md">

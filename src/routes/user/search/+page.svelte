@@ -1,6 +1,6 @@
 <script lang="ts">
   import BottomNav from '$lib/components/BottomNav.svelte';
-  import { Search, Clock, TrendingUp, X } from 'lucide-svelte';
+  import { Search, Clock, TrendingUp, X, CircleUser, ChevronDown } from 'lucide-svelte';
 
   let searchQuery = $state('');
   let isFocused = $state(false);
@@ -36,8 +36,21 @@
 </script>
 
 <div class="min-h-screen bg-bg-app pb-32 text-text-primary">
-  <!-- Search Header -->
-  <header class="px-6 pt-12 pb-4 sticky top-0 bg-bg-app/95 backdrop-blur-xl z-30">
+  <!-- Standardized Header -->
+  <header class="sticky top-0 bg-bg-app/95 backdrop-blur-xl z-30 border-b border-border-dark/30">
+    <div class="px-2 py-2 flex items-center justify-between gap-1">
+      <div class="flex items-center gap-1 ml-2">
+          <h1 class="text-xl font-black">🔍 Search</h1>
+      </div>
+
+      <div class="flex items-center gap-3 shrink-0 mr-1">
+        <a href="/user/profile" class="w-10 h-10 bg-surface rounded-full flex items-center justify-center shadow-sm border border-border-dark text-text-primary">
+           <CircleUser size={20} />
+        </a>
+      </div>
+    </div>
+    
+    <div class="px-6 py-4">
     <div class="relative">
       <Search size={20} class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
       <input 
