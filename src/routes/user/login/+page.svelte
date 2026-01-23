@@ -38,7 +38,7 @@
 
     setTimeout(() => {
       loading = false;
-      goto('/onboarding');
+      goto('/user/onboarding');
     }, 800);
   }
 </script>

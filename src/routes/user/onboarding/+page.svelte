@@ -12,7 +12,7 @@
       (position) => {
         setTimeout(() => {
           detecting = false;
-          goto('/nearby');
+          goto('/user/nearby');
         }, 1000);
       },
       (error) => {
@@ -71,7 +71,7 @@
         <div class="space-y-3">
           {#each savedAddresses as address}
             <button 
-              onclick={() => goto('/nearby')}
+              onclick={() => goto('/user/nearby')}
               class="w-full p-5 bg-surface border border-border-dark rounded-2xl flex items-center gap-4 hover:border-primary/30 transition-colors shadow-sm text-left"
             >
               <div class="p-3 bg-bg-app rounded-xl">
@@ -91,7 +91,7 @@
     <!-- Skip Option -->
     <div class="text-center pt-4">
       <button 
-        onclick={() => goto('/nearby')}
+        onclick={() => goto('/user/nearby')}
         class="text-sm font-bold text-text-muted hover:text-primary transition-colors"
       >
         Skip for now →

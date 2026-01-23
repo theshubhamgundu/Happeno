@@ -4,10 +4,10 @@
   import { cn } from '$lib/utils';
   
   const navItems = [
-    { icon: Home, label: 'Home', path: '/nearby' },
-    { icon: Search, label: 'Search', path: '/search' },
-    { icon: Tag, label: 'Offers', path: '/offers' },
-    { icon: User, label: 'Profile', path: '/profile' }
+    { icon: Home, label: 'Home', path: '/user/nearby' },
+    { icon: Search, label: 'Search', path: '/user/search' },
+    { icon: Tag, label: 'Offers', path: '/user/offers' },
+    { icon: User, label: 'Profile', path: '/user/profile' }
   ];
 </script>
 
@@ -17,7 +17,7 @@
       href={item.path} 
       class={cn(
         "flex flex-col items-center gap-1 transition-all duration-200 py-2 px-4",
-        $page.url.pathname === item.path || ($page.url.pathname === '/' && item.path === '/nearby') 
+        $page.url.pathname === item.path || ($page.url.pathname === '/' && item.path === '/user/nearby') 
           ? "text-primary" 
           : "text-text-muted hover:text-text-secondary"
       )}

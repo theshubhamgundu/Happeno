@@ -131,7 +131,7 @@
           </p>
         </div>
       </button>
-      <a href="/profile" class="p-2 bg-surface border border-border-dark rounded-full shadow-sm">
+      <a href="/user/profile" class="p-2 bg-surface border border-border-dark rounded-full shadow-sm">
          <CircleUser size={24} class="text-text-muted" />
       </a>
     </div>

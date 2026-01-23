@@ -17,18 +17,18 @@
   import { cn } from '$lib/utils';
 
   const menuItems = [
-    { name: 'Saved Offers', icon: ClipboardList, path: '/saved-offers' },
-    { name: 'Favorite Restaurants', icon: Heart, path: '/favorites' },
-    { name: 'Saved Addresses', icon: MapPin, path: '/addresses' },
+    { name: 'Saved Offers', icon: ClipboardList, path: '/user/saved-offers' },
+    { name: 'Favorite Restaurants', icon: Heart, path: '/user/favorites' },
+    { name: 'Saved Addresses', icon: MapPin, path: '/user/addresses' },
   ];
 
   const supportItems = [
-    { name: 'Help & Support', icon: HelpCircle, path: '/support' },
-    { name: 'Settings', icon: Settings, path: '/profile/settings' },
+    { name: 'Help & Support', icon: HelpCircle, path: '/user/support' },
+    { name: 'Settings', icon: Settings, path: '/user/profile/settings' },
   ];
 
   function handleLogout() {
-    goto('/');
+    goto('/user/login');
   }
 </script>
 
