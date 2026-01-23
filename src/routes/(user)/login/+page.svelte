@@ -8,7 +8,7 @@
 
   let phone = $state('');
   let otp = $state('');
-  let step = $state('phone'); // phone or otp
+  let step = $state<'phone' | 'otp'>('phone');
   let loading = $state(false);
   let error = $state('');
 
@@ -21,7 +21,6 @@
     loading = true;
     error = '';
     
-    // Simulate API call
     setTimeout(() => {
       step = 'otp';
       loading = false;
@@ -37,7 +36,6 @@
     loading = true;
     error = '';
 
-    // Simulate Verification
     setTimeout(() => {
       loading = false;
       goto('/onboarding');
@@ -45,84 +43,103 @@
   }
 </script>
 
-<div class="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden bg-bg-app">
-  <!-- Background Accents -->
-  <div class="absolute top-[-10%] right-[-10%] w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
-  <div class="absolute bottom-[-5%] left-[-5%] w-80 h-80 bg-urgency/5 rounded-full blur-3xl"></div>
+<div class="min-h-screen bg-bg-app text-text-primary flex flex-col">
+  <!-- Header -->
+  <header class="px-6 pt-12 pb-8 text-center">
+    <div class="flex items-center justify-center gap-3 mb-6">
+      <Logo size={48} />
+      <h1 class="text-3xl font-brand text-primary">Happeno</h1>
+    </div>
+    <p class="text-text-muted font-medium text-sm">
+      Discover restaurants & offers near you
+    </p>
+  </header>
 
-  <div class="w-full max-w-md flex flex-col items-center gap-8 relative z-10">
-    <div class="flex flex-col items-center gap-4 text-center">
-      <Logo size={100} />
-      <div>
-        <h1 class="text-5xl brand-text mb-2">Happeno</h1>
-        <p class="text-text-muted font-medium px-4">Instant deals for instant thrills. Discover what's live around you.</p>
+  <!-- Main Content -->
+  <main class="flex-1 px-6 flex flex-col">
+    {#if step === 'phone'}
+      <div class="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+        <div class="space-y-8">
+          <div class="text-center">
+            <h2 class="text-2xl font-black text-text-primary mb-2">Login or Sign up</h2>
+            <p class="text-sm text-text-muted">Enter your phone number to continue</p>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex items-center gap-3 p-4 bg-surface border border-border-dark rounded-2xl shadow-sm">
+              <div class="flex items-center gap-2 pr-3 border-r border-border-dark">
+                <span class="text-lg">🇮🇳</span>
+                <span class="text-sm font-bold text-text-secondary">+91</span>
+              </div>
+              <input 
+                bind:value={phone}
+                type="tel"
+                placeholder="Enter phone number"
+                class="flex-1 bg-transparent outline-none text-lg font-bold placeholder:text-text-muted placeholder:font-normal"
+              />
+            </div>
+
+            {#if error}
+              <p class="text-sm text-urgency font-medium">{error}</p>
+            {/if}
+
+            <Button onclick={handleSendOTP} {loading} class="w-full py-4 text-base font-bold bg-primary text-white rounded-2xl shadow-lg shadow-primary/20">
+              Continue
+            </Button>
+
+            <button 
+              onclick={() => { phone = '9999900000'; handleSendOTP(); setTimeout(() => { otp = '123456'; handleVerifyOTP(); }, 1000); }} 
+              class="w-full py-3 text-sm font-bold text-primary"
+            >
+              Skip to Demo →
+            </button>
+
+            <p class="text-[11px] text-center text-text-muted leading-relaxed">
+              By continuing, you agree to our <span class="text-text-primary underline">Terms of Service</span> and <span class="text-text-primary underline">Privacy Policy</span>
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <div class="w-full bg-white/50 backdrop-blur-xl p-8 rounded-[40px] border border-border-peach card-shadow">
-      {#if step === 'phone'}
-        <div class="flex flex-col gap-6">
-          <div class="text-center mb-2">
-            <h2 class="text-xl font-bold text-text-primary">Welcome!</h2>
-            <p class="text-sm text-text-secondary">Enter your phone number to get started</p>
+    {:else}
+      <div class="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+        <div class="space-y-8">
+          <div class="text-center">
+            <h2 class="text-2xl font-black text-text-primary mb-2">Verify your number</h2>
+            <p class="text-sm text-text-muted">Enter the 6-digit code sent to +91 {phone}</p>
           </div>
-          
-          <div class="relative">
-            <span class="absolute left-5 top-[52px] -translate-y-1/2 text-text-muted font-semibold">+91</span>
-            <Input 
-              label="Phone Number" 
-              placeholder="00000 00000" 
-              type="tel" 
-              bind:value={phone} 
-              error={error}
-              class="pl-14"
+
+          <div class="space-y-4">
+            <input 
+              bind:value={otp}
+              type="number"
+              placeholder="••••••"
+              maxlength="6"
+              class="w-full p-4 bg-surface border border-border-dark rounded-2xl text-center text-2xl font-black tracking-[8px] outline-none focus:border-primary transition-colors shadow-sm placeholder:text-text-muted"
             />
+
+            {#if error}
+              <p class="text-sm text-urgency font-medium text-center">{error}</p>
+            {/if}
+
+            <Button onclick={handleVerifyOTP} {loading} class="w-full py-4 text-base font-bold bg-primary text-white rounded-2xl shadow-lg shadow-primary/20">
+              Verify & Continue
+            </Button>
+
+            <div class="flex items-center justify-center gap-4 text-sm">
+              <button class="font-bold text-primary">Resend OTP</button>
+              <span class="text-text-muted">•</span>
+              <button onclick={() => step = 'phone'} class="font-bold text-text-muted">Change Number</button>
+            </div>
           </div>
-
-          <Button onclick={handleSendOTP} {loading} class="w-full py-4 text-lg">
-            Send OTP
-          </Button>
-          
-          <button 
-            onclick={() => { phone = '9999900000'; handleSendOTP(); setTimeout(() => { otp = '123456'; handleVerifyOTP(); }, 1000); }} 
-            class="w-full py-3 text-sm font-bold text-primary hover:bg-primary/5 rounded-2xl border border-primary/20 transition-all"
-          >
-            Demo Login (Skip OTP)
-          </button>
-          
-          <p class="text-[10px] text-center text-text-muted px-4 leading-relaxed">
-            By continuing, you agree to our Terms of Service and Privacy Policy.
-          </p>
         </div>
-      {:else}
-        <div class="flex flex-col gap-6">
-          <div class="text-center mb-2">
-            <h2 class="text-xl font-bold text-text-primary">Verify OTP</h2>
-            <p class="text-sm text-text-secondary">We sent a 6-digit code to +91 {phone}</p>
-          </div>
+      </div>
+    {/if}
+  </main>
 
-          <Input 
-            label="OTP Code" 
-            placeholder="000000" 
-            type="number" 
-            maxlength="6"
-            bind:value={otp} 
-            error={error}
-            class="text-center text-2xl tracking-[0.5em] font-bold"
-          />
-
-          <Button onclick={handleVerifyOTP} {loading} class="w-full py-4 text-lg">
-            Verify & Continue
-          </Button>
-
-          <button 
-            onclick={() => step = 'phone'} 
-            class="text-sm font-semibold text-primary hover:text-primary-dark transition-colors self-center"
-          >
-            Change Phone Number
-          </button>
-        </div>
-      {/if}
-    </div>
-  </div>
+  <!-- Footer -->
+  <footer class="px-6 py-8 text-center">
+    <p class="text-xs text-text-muted">
+      🏷️ Find exclusive offers from 500+ restaurants in Hyderabad
+    </p>
+  </footer>
 </div>
