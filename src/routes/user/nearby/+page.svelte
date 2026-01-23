@@ -1,91 +1,291 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import OfferCard from '$lib/components/OfferCard.svelte';
-  import Map from '$lib/components/Map.svelte';
   import BottomNav from '$lib/components/BottomNav.svelte';
-  import { Map as MapIcon, List, Search, Filter } from 'lucide-svelte';
+  import { 
+    MapPin, 
+    Search, 
+    ChevronRight, 
+    Star,
+    ChevronDown,
+    CircleUser
+  } from 'lucide-svelte';
   import { cn } from '$lib/utils';
 
-  let view = $state('list'); // list or map
-  let loading = $state(true);
+  let activeTab = $state<'online' | 'dineout'>('online');
   
-  // Mock data
-  const offers = [
-    { id: '1', merchant_name: 'Burger King', title: 'Buy 1 Get 1 Free on Whoppers', distance: 450, time_left: '2h 15m' },
-    { id: '2', merchant_name: 'Zara', title: 'Flat 50% Off Flash Sale', distance: 1200, time_left: '45m' },
-    { id: '3', merchant_name: 'Starbucks', title: 'Free Upgrade to Venti', distance: 800, time_left: '1h 30m' },
-    { id: '4', merchant_name: 'H&M', title: 'Extra 20% off on Fresh Arrivals', distance: 2100, time_left: '5h 10m' },
+  const foodCategories = [
+    { name: 'Biryani', image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&q=80' },
+    { name: 'Cakes', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=200&q=80' },
+    { name: 'Pizzas', image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&q=80' },
+    { name: 'Burgers', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&q=80' },
+    { name: 'Ice-Cream', image: 'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=200&q=80' },
+    { name: 'Shawarma', image: 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=200&q=80' },
+    { name: 'Waffle', image: 'https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=200&q=80' },
+    { name: 'Salad', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80' },
+    { name: 'Pastry', image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=200&q=80' },
+    { name: 'Kebabs', image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=200&q=80' },
+    { name: 'Tea', image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=200&q=80' },
+    { name: 'Juice', image: 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=200&q=80' },
   ];
 
-  onMount(() => {
-    setTimeout(() => loading = false, 1000);
-  });
+
+  const featuredRestaurants = [
+    { 
+      name: 'Pizza Hut', 
+      rating: 4.5, 
+      time: '40-45 mins', 
+      cuisines: 'Pizzas', 
+      area: 'Kachiguda',
+      offer: 'ITEMS AT ₹59',
+      offerColor: 'bg-primary',
+      image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80'
+    },
+    { 
+      name: 'Imperial Kitchen', 
+      rating: 4.3, 
+      time: '30-35 mins', 
+      cuisines: 'Biryani, Chinese, Indian...', 
+      area: 'Redhills',
+      offer: '40% OFF UPTO ₹80',
+      offerColor: 'bg-gradient-to-r from-amber-500 to-orange-500',
+      image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80'
+    },
+    { 
+      name: 'Zomoz - The Momo', 
+      rating: 4.2, 
+      time: '45-50 mins', 
+      cuisines: 'Momos, Chinese', 
+      area: 'Masab Tank',
+      offer: '50% OFF UPTO ₹100',
+      offerColor: 'bg-gradient-to-r from-teal-500 to-emerald-500',
+      image: 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=400&q=80'
+    },
+    { 
+      name: 'McDonalds', 
+      rating: 4.4, 
+      time: '25-30 mins', 
+      cuisines: 'Burgers, Fast Food', 
+      area: 'Mehdipatnam',
+      offer: 'FREE DELIVERY',
+      offerColor: 'bg-gradient-to-r from-indigo-500 to-purple-600',
+      image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80'
+    },
+  ];
+
+  const allRestaurants = [
+    { 
+      name: 'Prasuma Momo Kitchen', 
+      rating: 4.3, 
+      time: '40-45 mins', 
+      cuisines: 'Chinese, Pan-Asian, Beverages...', 
+      area: 'Banjara Hills',
+      offer: '60% OFF UPTO ₹120',
+      offerColor: 'bg-gradient-to-r from-pink-500 to-rose-500',
+      image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400&q=80'
+    },
+    { 
+      name: 'Al Taza', 
+      rating: 4.5, 
+      time: '25-30 mins', 
+      cuisines: 'Arabian, Juices, Beverages', 
+      area: 'Mehdipatnam',
+      offer: null,
+      offerColor: '',
+      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80'
+    },
+    { 
+      name: 'Paradise Biryani', 
+      rating: 4.6, 
+      time: '35-40 mins', 
+      cuisines: 'Biryani, North Indian', 
+      area: 'Secunderabad',
+      offer: 'FLAT ₹50 OFF',
+      offerColor: 'bg-primary',
+      image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&q=80'
+    },
+    { 
+      name: 'The Rameshwaram Cafe', 
+      rating: 4.4, 
+      time: '30-35 mins', 
+      cuisines: 'South Indian, Dosa', 
+      area: 'Jubilee Hills',
+      offer: '20% OFF',
+      offerColor: 'bg-gradient-to-r from-amber-500 to-orange-500',
+      image: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=400&q=80'
+    },
+  ];
 </script>
 
-<div class="min-h-screen bg-bg-app pb-24">
+<div class="min-h-screen bg-bg-app pb-32 text-text-primary">
   <!-- Header -->
-  <header class="sticky top-0 z-30 bg-bg-app/80 backdrop-blur-xl px-6 py-4 flex flex-col gap-4">
+  <header class="px-6 pt-8 pb-4 flex flex-col gap-4 sticky top-0 bg-bg-app/95 backdrop-blur-xl z-30 border-b border-border-dark/50">
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-heading font-extrabold text-text-primary">Near You</h1>
-      <div class="flex bg-white p-1 rounded-2xl border border-border-peach shadow-sm">
-        <button 
-          onclick={() => view = 'list'} 
-          class={cn("p-2 rounded-xl transition-all", view === 'list' ? "bg-primary text-white shadow-md shadow-primary/20" : "text-text-muted")}
-        >
-          <List size={20} />
-        </button>
-        <button 
-          onclick={() => view = 'map'} 
-          class={cn("p-2 rounded-xl transition-all", view === 'map' ? "bg-primary text-white shadow-md shadow-primary/20" : "text-text-muted")}
-        >
-          <MapIcon size={20} />
-        </button>
-      </div>
-    </div>
-
-    <div class="flex gap-2">
-      <div class="flex-1 relative">
-        <Search size={18} class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
-        <input 
-          placeholder="Search offers or brands..." 
-          class="w-full pl-11 pr-4 py-3 bg-white border border-border-peach rounded-2xl text-sm font-medium outline-none focus:border-primary transition-all"
-        />
-      </div>
-      <button class="p-3 bg-white border border-border-peach rounded-2xl text-text-secondary">
-        <Filter size={20} />
+      <button class="flex items-center gap-2 group text-left">
+        <MapPin size={20} class="text-primary" />
+        <div>
+          <div class="flex items-center gap-1">
+            <span class="text-sm font-bold">You are in Hyderabad!</span>
+          </div>
+          <p class="text-[10px] text-text-muted font-medium flex items-center gap-1">
+            Setup your precise location <ChevronRight size={12} />
+          </p>
+        </div>
       </button>
+      <a href="/user/profile" class="p-2 bg-surface border border-border-dark rounded-full shadow-sm">
+         <CircleUser size={24} class="text-text-muted" />
+      </a>
     </div>
 
-    <!-- Categories -->
-    <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-      {#each ['All', 'Food', 'Fashion', 'Tech', 'Grooming', 'Sports'] as cat}
-        <button class={cn(
-          "px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all border",
-          cat === 'All' ? "bg-primary text-white border-primary shadow-md shadow-primary/20" : "bg-white text-text-muted border-border-peach"
-        )}>
-          {cat}
-        </button>
-      {/each}
+    <!-- Search Bar -->
+    <div class="relative">
+      <input 
+        placeholder="Search for restaurants & offers" 
+        class="w-full pl-4 pr-12 py-4 bg-surface border border-border-dark rounded-2xl text-sm font-medium outline-none focus:border-primary/50 transition-all placeholder:text-text-muted shadow-sm"
+      />
+      <Search size={20} class="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted" />
     </div>
   </header>
 
-  <!-- Content -->
-  <main class="px-6 mt-2">
-    {#if view === 'list'}
-      <div class="flex flex-col gap-4">
-        {#each offers as offer}
-          <a href="/offer/{offer.id}">
-            <OfferCard {offer} />
+  <main class="px-6 space-y-10 pt-6">
+    <!-- Hero Banner -->
+    <section class="relative h-44 rounded-[32px] overflow-hidden shadow-lg group">
+      <img 
+        src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80" 
+        alt="Restaurant Banner" 
+        class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
+      <div class="relative h-full p-6 flex flex-col justify-end">
+        <div class="flex items-center gap-2 text-white/80 mb-2">
+          <div class="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-xs font-black">H</div>
+          <span class="text-xs font-bold uppercase tracking-widest">Discover</span>
+        </div>
+        <h2 class="text-xl font-black text-white leading-tight">
+          Explore Offers &<br/>
+          <span class="text-primary">Restaurants Near You</span>
+        </h2>
+      </div>
+    </section>
+
+    <!-- What's on your mind? -->
+    <section class="space-y-5">
+      <h3 class="text-xl font-black text-text-primary">What's on your mind?</h3>
+      <div class="grid grid-cols-6 gap-x-2 gap-y-4 overflow-x-auto no-scrollbar">
+        {#each foodCategories as cat}
+          <button class="flex flex-col items-center gap-2 group">
+            <div class="w-16 h-16 rounded-full overflow-hidden shadow-md group-hover:scale-110 transition-transform group-hover:shadow-lg bg-surface-lighter">
+              <img 
+                src={cat.image} 
+                alt={cat.name} 
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <span class="text-[10px] font-bold text-text-secondary text-center">{cat.name}</span>
+          </button>
+        {/each}
+      </div>
+    </section>
+
+
+    <!-- Restaurants With Best Offers -->
+    <section class="space-y-5">
+      <h3 class="text-xl font-black text-text-primary">🔥 Best Offers Near You</h3>
+      <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+        {#each featuredRestaurants as restaurant}
+          <a href="/restaurant/{restaurant.name}" class="flex-shrink-0 w-44 group">
+            <div class="relative aspect-square rounded-[24px] overflow-hidden border border-border-dark shadow-md">
+              <img src={restaurant.image} alt={restaurant.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+              {#if restaurant.offer}
+                <div class="absolute bottom-3 left-3 right-3">
+                  <div class={cn("px-3 py-1.5 rounded-lg text-[10px] font-black text-white uppercase tracking-wider", restaurant.offerColor)}>
+                    {restaurant.offer}
+                  </div>
+                </div>
+              {/if}
+            </div>
+            <div class="mt-3 space-y-1">
+              <h4 class="font-bold text-sm line-clamp-1">{restaurant.name}</h4>
+              <div class="flex items-center gap-1.5 text-[11px]">
+                <div class="flex items-center gap-0.5 px-1.5 py-0.5 bg-success text-white rounded font-bold">
+                  <Star size={10} fill="white" /> {restaurant.rating}
+                </div>
+                <span class="text-text-muted font-medium">• {restaurant.time}</span>
+              </div>
+              <p class="text-[10px] text-text-muted line-clamp-1">{restaurant.cuisines}</p>
+              <p class="text-[10px] text-text-muted font-medium">{restaurant.area}</p>
+            </div>
           </a>
         {/each}
       </div>
-    {:else}
-      <div class="h-[60vh] w-full mt-2 relative">
-        <Map 
-          markers={offers.map(o => ({ lat: 17.4483 + (Math.random() - 0.5) * 0.02, lng: 78.3915 + (Math.random() - 0.5) * 0.02, title: o.merchant_name }))} 
-        />
+    </section>
+
+    <!-- Offers / All Restaurants Tabs -->
+    <section class="space-y-6">
+      <div class="flex items-center gap-8 border-b border-border-dark">
+        <button 
+          onclick={() => activeTab = 'online'}
+          class={cn(
+            "pb-3 text-sm font-bold transition-all relative",
+            activeTab === 'online' ? "text-text-primary" : "text-text-muted"
+          )}
+        >
+          Best Offers
+          {#if activeTab === 'online'}
+            <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-full"></div>
+          {/if}
+        </button>
+        <button 
+          onclick={() => activeTab = 'dineout'}
+          class={cn(
+            "pb-3 text-sm font-bold transition-all relative",
+            activeTab === 'dineout' ? "text-text-primary" : "text-text-muted"
+          )}
+        >
+          All Restaurants
+          {#if activeTab === 'dineout'}
+            <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-full"></div>
+          {/if}
+        </button>
       </div>
-    {/if}
+
+      <div class="space-y-4">
+        <h3 class="text-lg font-black text-text-primary">Popular Order Food Online restaurants near me</h3>
+        <button class="flex items-center gap-2 px-4 py-2 bg-surface border border-border-dark rounded-full text-xs font-bold shadow-sm">
+          Sort By <ChevronDown size={14} />
+        </button>
+      </div>
+
+      <!-- Restaurant Grid -->
+      <div class="grid grid-cols-2 gap-5">
+        {#each allRestaurants as restaurant}
+          <a href="/restaurant/{restaurant.name}" class="group">
+            <div class="relative aspect-square rounded-[24px] overflow-hidden border border-border-dark shadow-md">
+              <img src={restaurant.image} alt={restaurant.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              {#if restaurant.offer}
+                <div class="absolute bottom-3 left-3 right-3">
+                  <div class={cn("px-3 py-1.5 rounded-lg text-[10px] font-black text-white uppercase tracking-wider", restaurant.offerColor)}>
+                    {restaurant.offer}
+                  </div>
+                </div>
+              {/if}
+            </div>
+            <div class="mt-3 space-y-1">
+              <h4 class="font-bold text-sm line-clamp-1">{restaurant.name}</h4>
+              <div class="flex items-center gap-1.5 text-[11px]">
+                <div class="flex items-center gap-0.5 px-1.5 py-0.5 bg-success text-white rounded font-bold">
+                  <Star size={10} fill="white" /> {restaurant.rating}
+                </div>
+                <span class="text-text-muted font-medium">• {restaurant.time}</span>
+              </div>
+              <p class="text-[10px] text-text-muted line-clamp-1">{restaurant.cuisines}</p>
+              <p class="text-[10px] text-text-muted font-medium">{restaurant.area}</p>
+            </div>
+          </a>
+        {/each}
+      </div>
+    </section>
   </main>
 </div>
 
