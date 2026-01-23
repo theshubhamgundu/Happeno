@@ -11,7 +11,7 @@
   ];
 </script>
 
-<nav class="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur-xl border-t border-border-dark px-4 pt-2 pb-6 flex justify-around items-center z-50 shadow-lg">
+<nav class="fixed bottom-0 left-0 right-0 bg-bg-app backdrop-blur-xl border-t border-border-dark px-4 pt-2 pb-3 flex justify-around items-center z-50 shadow-lg">
   {#each navItems as item}
     <a 
       href={item.path} 
@@ -23,7 +23,10 @@
       )}
     >
       <item.icon size={22} strokeWidth={$page.url.pathname === item.path ? 2.5 : 2} />
-      <span class="text-[9px] font-bold uppercase tracking-wider">{item.label}</span>
+      <span class={cn(
+        "text-[9px] font-bold uppercase tracking-wider mt-1",
+        $page.url.pathname === item.path ? "text-primary" : "text-text-muted"
+      )}>{item.label}</span>
     </a>
   {/each}
 </nav>

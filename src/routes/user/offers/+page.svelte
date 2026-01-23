@@ -1,6 +1,6 @@
 <script lang="ts">
   import BottomNav from '$lib/components/BottomNav.svelte';
-  import { Tag, Star, MapPin, Clock, Filter, ChevronDown } from 'lucide-svelte';
+  import { Ticket, Star, MapPin, Clock, Filter, ChevronDown, CircleUser, Search } from 'lucide-svelte';
   import { cn } from '$lib/utils';
 
   let activeCategory = $state('all');
@@ -66,17 +66,26 @@
 </script>
 
 <div class="min-h-screen bg-bg-app pb-32 text-text-primary">
-  <!-- Header -->
-  <header class="px-6 pt-12 pb-4 sticky top-0 bg-bg-app/95 backdrop-blur-xl z-20 border-b border-border-dark/50">
-    <div class="flex items-center justify-between mb-4">
-      <h1 class="text-2xl font-black">🔥 Offers</h1>
-      <button class="flex items-center gap-2 px-4 py-2 bg-surface border border-border-dark rounded-full text-xs font-bold">
-        <Filter size={14} /> Filter
-      </button>
+  <!-- Header (Standardized) -->
+  <header class="sticky top-0 bg-bg-app/95 backdrop-blur-xl z-30 border-b border-border-dark/30">
+    <div class="px-2 py-2 flex items-center justify-between gap-1">
+      <div class="flex items-center gap-1 ml-1">
+          <h1 class="text-xl font-black">🔥 Exclusive Offers</h1>
+      </div>
+
+      <div class="flex items-center gap-3 shrink-0 mr-1">
+        <a href="/user/search" class="w-10 h-10 bg-surface rounded-full flex items-center justify-center shadow-sm border border-border-dark text-text-primary">
+          <Search size={20} />
+        </a>
+        <a href="/user/profile" class="w-10 h-10 bg-surface rounded-full flex items-center justify-center shadow-sm border border-border-dark text-text-primary">
+           <CircleUser size={20} />
+        </a>
+      </div>
     </div>
     
-    <!-- Categories -->
-    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+    <!-- Categories (Edge-to-Edge) -->
+    <div class="px-6 pb-4">
+      <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-6 px-6">
       {#each categories as cat}
         <button 
           onclick={() => activeCategory = cat.id}
