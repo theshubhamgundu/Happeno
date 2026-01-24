@@ -7,15 +7,15 @@
     }
 </script>
 
-<div class="min-h-screen bg-[#FFF5E1] pb-10">
+<div class="min-h-screen bg-bg-app pb-10 transition-colors duration-300">
     <!-- Header -->
     <header
-        class="bg-white px-6 pt-12 pb-6 rounded-b-[40px] shadow-sm sticky top-0 z-20"
+        class="bg-surface px-6 pt-12 pb-6 rounded-b-[40px] shadow-sm sticky top-0 z-20 transition-colors duration-300"
     >
         <div class="flex items-center gap-4">
             <button
                 onclick={goBack}
-                class="p-2 -ml-2 hover:bg-slate-50 rounded-full transition-colors"
+                class="p-2 -ml-2 hover:bg-highlight rounded-full transition-colors"
             >
                 <ArrowLeft size={24} class="text-text-primary" />
             </button>
@@ -34,7 +34,7 @@
 
     <main class="px-6 mt-8 flex flex-col gap-6">
         <div
-            class="bg-white p-6 rounded-[32px] border border-border-peach shadow-sm"
+            class="bg-surface p-6 rounded-[32px] border border-border-peach shadow-sm transition-colors duration-300"
         >
             <div class="flex items-center gap-3 mb-4 text-primary">
                 <Shield size={24} />
@@ -53,14 +53,14 @@
                     1. Information We Collect
                 </h3>
                 <div
-                    class="bg-white p-5 rounded-[24px] border border-slate-100 space-y-3"
+                    class="bg-surface p-5 rounded-[24px] border border-border-peach space-y-3 transition-colors duration-300"
                 >
                     <div class="flex gap-3">
                         <div
                             class="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"
                         ></div>
                         <p class="text-sm text-text-secondary leading-relaxed">
-                            <span class="font-bold text-slate-700"
+                            <span class="font-bold text-text-primary"
                                 >Location Data:</span
                             > We collect your precise location to show you restaurants
                             and offers within your immediate vicinity.
@@ -71,7 +71,7 @@
                             class="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"
                         ></div>
                         <p class="text-sm text-text-secondary leading-relaxed">
-                            <span class="font-bold text-slate-700"
+                            <span class="font-bold text-text-primary"
                                 >Account Information:</span
                             >
                             Name, email (or phone number), and preferences when you
@@ -83,7 +83,7 @@
                             class="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"
                         ></div>
                         <p class="text-sm text-text-secondary leading-relaxed">
-                            <span class="font-bold text-slate-700"
+                            <span class="font-bold text-text-primary"
                                 >Usage Data:</span
                             > Interactions with offers, menus views, and navigation
                             requests.
@@ -97,7 +97,7 @@
                     2. How We Use Your Data
                 </h3>
                 <ul
-                    class="bg-white p-5 rounded-[24px] border border-slate-100 space-y-3 text-sm text-text-secondary leading-relaxed list-disc pl-9 marker:text-primary"
+                    class="bg-surface p-5 rounded-[24px] border border-border-peach space-y-3 text-sm text-text-secondary leading-relaxed list-disc pl-9 marker:text-primary transition-colors duration-300"
                 >
                     <li>To provide and maintain the Service.</li>
                     <li>To notify you about changes to our Service.</li>
@@ -115,7 +115,7 @@
                     3. Data Sharing
                 </h3>
                 <div
-                    class="bg-white p-5 rounded-[24px] border border-slate-100"
+                    class="bg-surface p-5 rounded-[24px] border border-border-peach transition-colors duration-300"
                 >
                     <p class="text-sm text-text-secondary leading-relaxed">
                         We <span class="font-bold text-text-primary"
@@ -132,7 +132,7 @@
                     4. Security
                 </h3>
                 <div
-                    class="bg-white p-5 rounded-[24px] border border-slate-100"
+                    class="bg-surface p-5 rounded-[24px] border border-border-peach transition-colors duration-300"
                 >
                     <p class="text-sm text-text-secondary leading-relaxed">
                         The security of your data is important to us, but
@@ -150,7 +150,7 @@
                     5. Contact Us
                 </h3>
                 <div
-                    class="bg-white p-5 rounded-[24px] border border-slate-100"
+                    class="bg-surface p-5 rounded-[24px] border border-border-peach transition-colors duration-300"
                 >
                     <p class="text-sm text-text-secondary leading-relaxed">
                         If you have any questions about this Privacy Policy,

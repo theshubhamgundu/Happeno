@@ -73,15 +73,15 @@
     );
 </script>
 
-<div class="min-h-screen bg-[#FFF5E1] pb-10">
+<div class="min-h-screen bg-bg-app pb-10 transition-colors duration-300">
     <!-- Header -->
     <header
-        class="bg-white px-6 pt-12 pb-6 rounded-b-[40px] shadow-sm sticky top-0 z-20"
+        class="bg-surface px-6 pt-12 pb-6 rounded-b-[40px] shadow-sm sticky top-0 z-20 transition-colors duration-300"
     >
         <div class="flex items-center gap-4 mb-6">
             <button
                 onclick={() => goto("/merchant/profile")}
-                class="p-2 -ml-2 hover:bg-slate-50 rounded-full transition-colors"
+                class="p-2 -ml-2 hover:bg-highlight rounded-full transition-colors"
             >
                 <ArrowLeft size={24} class="text-text-primary" />
             </button>
@@ -92,21 +92,21 @@
 
         <div class="relative">
             <div
-                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
             >
                 <Search size={20} />
             </div>
             <input
                 bind:value={searchQuery}
                 placeholder="Search for help..."
-                class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:bg-white focus:border-primary/50 focus:shadow-sm transition-all font-medium text-slate-800 placeholder:text-slate-400"
+                class="w-full pl-12 pr-4 py-4 bg-highlight border border-border-peach rounded-2xl outline-none focus:bg-surface focus:border-primary/50 focus:shadow-sm transition-all font-medium text-text-primary placeholder:text-text-muted"
             />
         </div>
     </header>
 
     <main class="px-6 mt-8 flex flex-col gap-8">
         {#if filteredFaqs.length === 0}
-            <div class="text-center py-10 text-slate-400">
+            <div class="text-center py-10 text-text-muted">
                 <p>No results found for "{searchQuery}"</p>
             </div>
         {/if}
@@ -119,24 +119,24 @@
                     {category.category}
                 </h2>
                 <div
-                    class="bg-white rounded-[28px] border border-border-peach shadow-sm overflow-hidden"
+                    class="bg-surface rounded-[28px] border border-border-peach shadow-sm overflow-hidden transition-colors duration-300"
                 >
                     {#each category.questions as question, qIndex}
                         <div
                             class={qIndex !== 0
-                                ? "border-t border-slate-50"
+                                ? "border-t border-border-peach"
                                 : ""}
                         >
                             <button
                                 onclick={() => toggle(cIndex, qIndex)}
-                                class="w-full text-left p-5 flex items-start justify-between gap-4 hover:bg-slate-50/50 transition-colors"
+                                class="w-full text-left p-5 flex items-start justify-between gap-4 hover:bg-highlight/50 transition-colors"
                             >
                                 <span
                                     class="font-bold text-text-primary text-base leading-tight"
                                     >{question.q}</span
                                 >
                                 <div
-                                    class="shrink-0 transition-transform duration-300 text-slate-400"
+                                    class="shrink-0 transition-transform duration-300 text-text-muted"
                                     class:rotate-180={expandedIndex ===
                                         `${cIndex}-${qIndex}`}
                                 >

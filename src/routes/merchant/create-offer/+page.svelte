@@ -71,7 +71,9 @@
   }
 </script>
 
-<div class="min-h-screen bg-bg-app pb-24 relative overflow-x-hidden">
+<div
+  class="min-h-screen bg-bg-app pb-24 relative overflow-x-hidden transition-colors duration-300"
+>
   <!-- Subtle Background Blobs -->
   <div
     class="fixed -top-32 -right-32 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"
@@ -85,7 +87,7 @@
   >
     <button
       onclick={() => history.back()}
-      class="p-3 bg-white/50 border border-slate-100/50 backdrop-blur-md rounded-2xl text-text-primary hover:bg-white hover:shadow-sm transition-all active:scale-95"
+      class="p-3 bg-surface/50 border border-border-peach/50 backdrop-blur-md rounded-2xl text-text-primary hover:bg-surface hover:shadow-sm transition-all active:scale-95"
     >
       <ChevronLeft size={24} />
     </button>
@@ -109,7 +111,7 @@
           Offer Visual
         </h2>
         <span
-          class="text-[10px] font-bold uppercase tracking-widest text-text-muted bg-white/50 px-2 py-1 rounded-md"
+          class="text-[10px] font-bold uppercase tracking-widest text-text-muted bg-surface/50 px-2 py-1 rounded-md"
           >Step 1</span
         >
       </div>
@@ -124,7 +126,7 @@
 
       {#if imagePreview}
         <div
-          class="w-full aspect-video relative rounded-3xl overflow-hidden shadow-lg shadow-slate-200/50 animate-in zoom-in-95 duration-300"
+          class="w-full aspect-video relative rounded-3xl overflow-hidden shadow-lg shadow-primary/5 animate-in zoom-in-95 duration-300"
         >
           <img
             src={imagePreview}
@@ -154,14 +156,14 @@
       {:else}
         <button
           onclick={() => fileInput.click()}
-          class="w-full aspect-video bg-white/60 border-2 border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-primary/50 hover:bg-white hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group active:scale-[0.99]"
+          class="w-full aspect-video bg-surface/60 border-2 border-dashed border-border-peach rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-primary/50 hover:bg-surface hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group active:scale-[0.99]"
         >
           <div
-            class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300"
+            class="w-16 h-16 rounded-2xl bg-highlight flex items-center justify-center group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300"
           >
             <Upload
               size={28}
-              class="text-slate-400 group-hover:text-primary transition-colors"
+              class="text-text-muted group-hover:text-primary transition-colors"
             />
           </div>
           <div class="text-center">
@@ -190,7 +192,7 @@
           Details
         </h2>
         <span
-          class="text-[10px] font-bold uppercase tracking-widest text-text-muted bg-white/50 px-2 py-1 rounded-md"
+          class="text-[10px] font-bold uppercase tracking-widest text-text-muted bg-surface/50 px-2 py-1 rounded-md"
           >Step 2</span
         >
       </div>
@@ -221,13 +223,13 @@
           Pricing
         </h2>
         <span
-          class="text-[10px] font-bold uppercase tracking-widest text-text-muted bg-white/50 px-2 py-1 rounded-md"
+          class="text-[10px] font-bold uppercase tracking-widest text-text-muted bg-surface/50 px-2 py-1 rounded-md"
           >Step 3</span
         >
       </div>
 
       <div
-        class="p-5 bg-white rounded-3xl border border-slate-100 shadow-sm space-y-4"
+        class="p-5 bg-surface rounded-3xl border border-border-peach shadow-sm space-y-4 transition-colors duration-300"
       >
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-2">
@@ -237,7 +239,7 @@
             >
             <div class="relative group">
               <div
-                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors"
+                class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-primary transition-colors"
               >
                 <IndianRupee size={16} />
               </div>
@@ -245,7 +247,7 @@
                 id="original"
                 type="number"
                 placeholder="000"
-                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-primary/20 focus:shadow-lg focus:shadow-primary/5 transition-all font-bold text-lg text-slate-600"
+                class="w-full pl-10 pr-4 py-3 bg-highlight border border-transparent rounded-2xl outline-none focus:bg-surface focus:border-primary/20 focus:shadow-lg focus:shadow-primary/5 transition-all font-bold text-lg text-text-secondary"
                 bind:value={originalPrice}
               />
             </div>
@@ -258,7 +260,7 @@
             >
             <div class="relative group">
               <div
-                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors"
+                class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-primary transition-colors"
               >
                 <IndianRupee size={16} />
               </div>
@@ -266,7 +268,7 @@
                 id="discounted"
                 type="number"
                 placeholder="000"
-                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-primary/20 focus:shadow-lg focus:shadow-primary/5 transition-all font-bold text-lg text-primary"
+                class="w-full pl-10 pr-4 py-3 bg-highlight border border-transparent rounded-2xl outline-none focus:bg-surface focus:border-primary/20 focus:shadow-lg focus:shadow-primary/5 transition-all font-bold text-lg text-primary"
                 bind:value={discountedPrice}
               />
             </div>
@@ -283,8 +285,10 @@
               %
             </div>
             <div>
-              <div class="text-sm font-bold text-slate-700">Great Deal!</div>
-              <div class="text-xs text-slate-500 font-medium">
+              <div class="text-sm font-bold text-text-secondary">
+                Great Deal!
+              </div>
+              <div class="text-xs text-text-muted font-medium">
                 You are offering <span class="text-success font-black"
                   >{discountPercentage}</span
                 >
@@ -298,7 +302,7 @@
 
   <!-- Publish Bar -->
   <div
-    class="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-slate-100 z-40 rounded-t-[40px] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] animate-in slide-in-from-bottom-full duration-700 delay-500"
+    class="fixed bottom-0 left-0 right-0 p-6 bg-surface/80 backdrop-blur-xl border-t border-border-peach z-40 rounded-t-[40px] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] animate-in slide-in-from-bottom-full duration-700 delay-500 transition-colors duration-300"
   >
     <Button
       onclick={handlePublish}

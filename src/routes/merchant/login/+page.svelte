@@ -60,7 +60,7 @@
     </div>
 
     <div
-      class="bg-white p-8 rounded-[40px] border border-border-peach shadow-2xl shadow-primary/5"
+      class="bg-surface p-8 rounded-[40px] border border-border-peach shadow-2xl shadow-primary/5 transition-colors duration-300"
     >
       <div class="flex flex-col gap-6">
         <div class="text-center mb-2">
