@@ -1,42 +1,32 @@
 <script lang="ts">
-  import { Home, Bookmark, User, Search } from "lucide-svelte";
-  import { page } from "$app/stores";
-  import { cn } from "$lib/utils";
-
+  import { Home, Search, Tag, User } from 'lucide-svelte';
+  import { page } from '$app/stores';
+  import { cn } from '$lib/utils';
+  
   const navItems = [
-    { icon: Search, label: "Nearby", path: "/user/nearby" },
-    { icon: Bookmark, label: "Saved", path: "/user/saved" },
-    { icon: User, label: "Profile", path: "/user/profile" },
+    { icon: Home, label: 'Home', path: '/user/nearby' },
+    { icon: Search, label: 'Search', path: '/user/search' },
+    { icon: Tag, label: 'Offers', path: '/user/offers' },
+    { icon: User, label: 'Profile', path: '/user/profile' }
   ];
 </script>
 
-<nav
-  class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-2xl border-t border-border-peach px-6 pt-3 pb-8 flex justify-between items-center z-50"
->
+<nav class="fixed bottom-0 left-0 right-0 bg-bg-app backdrop-blur-xl border-t border-border-dark px-4 pt-2 pb-3 flex justify-around items-center z-50 shadow-lg">
   {#each navItems as item}
-    <a
-      href={item.path}
+    <a 
+      href={item.path} 
       class={cn(
-        "flex flex-col items-center gap-1 transition-all duration-300",
-        $page.url.pathname === item.path
-          ? "text-primary scale-110"
-          : "text-text-muted hover:text-text-secondary",
+        "flex flex-col items-center gap-1 transition-all duration-200 py-2 px-4",
+        $page.url.pathname === item.path || ($page.url.pathname === '/' && item.path === '/user/nearby') 
+          ? "text-primary" 
+          : "text-text-muted hover:text-text-secondary"
       )}
     >
-      <div
-        class={cn(
-          "p-2 rounded-2xl transition-all",
-          $page.url.pathname === item.path ? "bg-primary/10" : "bg-transparent",
-        )}
-      >
-        <item.icon
-          size={22}
-          strokeWidth={$page.url.pathname === item.path ? 2.5 : 2}
-        />
-      </div>
-      <span class="text-[10px] font-bold uppercase tracking-widest"
-        >{item.label}</span
-      >
+      <item.icon size={22} strokeWidth={$page.url.pathname === item.path ? 2.5 : 2} />
+      <span class={cn(
+        "text-[9px] font-bold uppercase tracking-wider mt-1",
+        $page.url.pathname === item.path ? "text-primary" : "text-text-muted"
+      )}>{item.label}</span>
     </a>
   {/each}
 </nav>
