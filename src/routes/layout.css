@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 
-<<<<<<< HEAD
 :root {
   /* Branding Colors (Updated from Main) */
   --color-primary: #FF107C;
@@ -13,15 +12,12 @@
   --color-bg-app: #FFF3E6;
   --color-surface: #FFFFFF;
   --color-surface-lighter: #FCF4ED;
-  /* From Main */
   --color-highlight: #FF107C15;
-  /* From Main */
   --color-text-primary: #1A1A1A;
   --color-text-secondary: #4A2F2F;
   --color-text-muted: #7B4B5A;
   --color-border-peach: #FFD6C9;
   --color-border-dark: #E6D5C3;
-  /* From Main */
   --color-input-rose: #F2B8C6;
 }
 
@@ -30,14 +26,12 @@
   --color-bg-app: #000000;
   --color-surface: #111111;
   --color-surface-lighter: #1A1A1A;
-  /* Dark Equiv */
   --color-highlight: #222222;
   --color-text-primary: #E0E0E0;
   --color-text-secondary: #B0B0B0;
   --color-text-muted: #666666;
   --color-border-peach: #333333;
   --color-border-dark: #444444;
-  /* Dark Equiv */
   --color-input-rose: #1A1A1A;
 }
 
@@ -61,23 +55,6 @@
   --color-border-dark: var(--color-border-dark);
   --color-input-rose: var(--color-input-rose);
 
-=======
-@theme {
-  --color-primary: #FF107C; 
-  --color-primary-dark: #C51662;
-  --color-secondary: #008891; /* Darkened Cyan for light mode contrast */
-  --color-urgency: #FF9F1C;
-  --color-success: #22C55E;
-  --color-bg-app: #FFF3E6; /* Back to Soft Cream */
-  --color-surface: #FFFFFF; 
-  --color-surface-lighter: #FCF4ED;
-  --color-highlight: #FF107C15;
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #4A2F2F;
-  --color-text-muted: #7B4B5A;
-  --color-border-dark: #E6D5C3; /* Softer border for light mode */
-  
->>>>>>> 4820ce0
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-heading: 'Outfit', sans-serif;
   --font-brand: 'Fredoka', sans-serif;
@@ -109,12 +86,8 @@
   .glass {
     @apply bg-white/60 backdrop-blur-xl border border-white/40;
   }
-<<<<<<< HEAD
 
   /* Utilities from Main */
-=======
-  
->>>>>>> 4820ce0
   .gradient-primary {
     background: linear-gradient(135deg, #FF107C 0%, #BA14FF 100%);
   }
@@ -129,14 +102,11 @@
 
   .card-glow {
     box-shadow: 0 12px 40px -12px rgba(74, 47, 47, 0.15);
-<<<<<<< HEAD
   }
 
   /* Utilities from Merchant */
   .card-shadow {
     box-shadow: 0 4px 20px -2px rgba(236, 28, 121, 0.1), 0 2px 10px -2px rgba(236, 28, 121, 0.05);
-=======
->>>>>>> 4820ce0
   }
 
   .no-scrollbar::-webkit-scrollbar {
