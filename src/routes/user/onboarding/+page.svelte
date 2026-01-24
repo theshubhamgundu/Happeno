@@ -17,7 +17,7 @@
   let debounceTimer: any;
   let usingFallback = $state(false);
 
-  const OLA_API_KEY = 'kHU0HCI2mlwBKox2kRwcTgpjsfEz0LEXKDPKcGhx';
+  import { PUBLIC_OLA_MAP_API_KEY as OLA_API_KEY } from '$env/static/public';
 
   // Ola Maps SDK global
   declare const OlaMaps: any;
@@ -34,12 +34,11 @@
           initOlaMaps();
         }
         
-        if (attempts > 30) { // 3 seconds fallback
+        if (attempts > 40) { // 4 seconds fallback
           clearInterval(checkOla);
-          if (!map) {
+          if (!map && !usingFallback) {
              console.warn("Ola Maps SDK failed to load. Launching Emergency Fallback...");
-             usingFallback = true;
-             initLeaflet();
+             triggerFallback();
           }
         }
       }, 100);
@@ -47,6 +46,13 @@
       return () => clearInterval(checkOla);
     }
   });
+
+  function triggerFallback() {
+    if (usingFallback) return;
+    usingFallback = true;
+    if (map && typeof map.remove === 'function') map.remove();
+    initLeaflet();
+  }
 
   async function initLeaflet() {
     const L = (await import('leaflet')).default;
@@ -100,11 +106,9 @@
 
       // Catch Styling/Tiles errors (like 403 Forbidden)
       map.on('error', (e: any) => {
-        console.warn("Ola Maps Style Error (likely 403):", e);
-        if (!usingFallback) {
-          usingFallback = true;
-          initLeaflet();
-        }
+        console.warn("Ola Maps Engine Error:", e);
+        // Specifically catch 403 styling errors
+        triggerFallback();
       });
 
       map.on('movestart', () => {
@@ -120,7 +124,7 @@
           const res = await fetch(`https://api.olamaps.io/places/v1/reverse-geocode?latlng=${center.lat},${center.lng}&api_key=${OLA_API_KEY}`);
           if (res.status === 403) throw new Error("403 Forbidden");
           const data = await res.json();
-          if (data.results && data.results.length > 0) {
+          if (data.results?.[0]) {
             const first = data.results[0];
             address = first.name || first.formatted_address.split(',')[0];
             subAddress = first.formatted_address.split(',').slice(1).join(', ').trim();
@@ -135,8 +139,7 @@
       });
     } catch (err) {
       console.error("Ola Maps Critical Init Error:", err);
-      usingFallback = true;
-      initLeaflet();
+      triggerFallback();
     }
   }
 
@@ -153,6 +156,7 @@
       try {
         if (!usingFallback) {
           const res = await fetch(`https://api.olamaps.io/places/v1/autocomplete?input=${encodeURIComponent(searchQuery)}&api_key=${OLA_API_KEY}`);
+          if (res.status === 403) throw new Error("Search 403");
           const data = await res.json();
           if (data.predictions) {
             suggestions = data.predictions.map((p: any) => ({
@@ -192,7 +196,7 @@
       try {
         const res = await fetch(`https://api.olamaps.io/places/v1/details?place_id=${suggestion.placeId}&api_key=${OLA_API_KEY}`);
         const data = await res.json();
-        if (data.result && data.result.geometry && data.result.geometry.location) {
+        if (data.result?.geometry?.location) {
           const { lat, lng } = data.result.geometry.location;
           map.setCenter([lng, lat]);
           map.setZoom(17);

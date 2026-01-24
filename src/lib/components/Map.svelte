@@ -22,12 +22,14 @@
   // Ola Maps SDK global
   declare const OlaMaps: any;
 
+  import { PUBLIC_OLA_MAP_API_KEY as OLA_API_KEY } from '$env/static/public';
+
   onMount(() => {
     // Check if OlaMaps is loaded from app.html
     if (typeof OlaMaps !== 'undefined') {
       try {
         const olaMaps = new OlaMaps({
-          apiKey: 'kHU0HCI2mlwBKox2kRwcTgpjsfEz0LEXKDPKcGhx'
+          apiKey: OLA_API_KEY
         });
 
         map = olaMaps.init({
