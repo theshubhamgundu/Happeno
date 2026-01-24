@@ -22,6 +22,8 @@
     menuItemsStore,
     profileStore,
   } from "$lib/stores/merchant";
+  import { fly, fade } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
 
   let timeRange = $state("7D"); // 24H, 7D, 1M, 1Y
 
@@ -71,7 +73,10 @@
   ];
 </script>
 
-<div class="px-4 py-6 pb-32 flex flex-col gap-6 bg-[#FFF5E1] min-h-screen">
+<div
+  class="px-4 py-6 pb-32 flex flex-col gap-6 bg-[#FFF5E1] min-h-screen"
+  in:fade={{ duration: 300 }}
+>
   <!-- Header with generic add -->
   <header class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
@@ -83,7 +88,7 @@
       <div class="flex items-center gap-2">
         <a
           href="/merchant/create-offer"
-          class="rounded-xl p-2.5 sm:px-4 sm:py-2 text-sm font-bold bg-[#FF69B4] text-white hover:bg-[#FF1493] transition-all shadow-md flex items-center gap-2"
+          class="rounded-xl p-2.5 sm:px-4 sm:py-2 text-sm font-bold bg-[#FF69B4] text-white hover:bg-[#FF1493] hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md flex items-center gap-2 active:scale-95 duration-200"
         >
           <Plus size={20} />
           <span class="hidden sm:inline whitespace-nowrap">Custom Offer</span>
@@ -91,14 +96,14 @@
 
         <a
           href="/merchant/history"
-          class="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-primary hover:border-primary/50 transition-all shadow-sm"
+          class="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-primary hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5 transition-all shadow-sm active:scale-95 duration-200"
           title="History"
         >
           <History size={20} />
         </a>
         <a
           href="/merchant/profile"
-          class="p-1 rounded-full border border-slate-200 hover:border-primary/50 transition-all shadow-sm overflow-hidden w-10 h-10 flex items-center justify-center bg-white"
+          class="p-1 rounded-full border border-slate-200 hover:border-primary/50 hover:shadow-md transition-all shadow-sm overflow-hidden w-10 h-10 flex items-center justify-center bg-white active:scale-95 duration-200"
           title="Profile"
         >
           {#if $profileStore.image}
@@ -116,10 +121,13 @@
   </header>
 
   <!-- Summary Stats Grid -->
-  <div class="grid grid-cols-2 gap-3">
+  <div
+    class="grid grid-cols-2 gap-3"
+    in:fly={{ y: 20, duration: 600, delay: 100, easing: cubicOut }}
+  >
     <button
       onclick={() => goto("/merchant/history?filter=active")}
-      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-primary/50 transition-all active:scale-95"
+      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-primary/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
     >
       <div class="flex justify-between items-start">
         <div class="p-2.5 rounded-2xl bg-slate-50">
@@ -140,7 +148,7 @@
 
     <button
       onclick={() => goto("/merchant/history?filter=expiring")}
-      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-urgency/50 transition-all active:scale-95"
+      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-urgency/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
     >
       <div class="flex justify-between items-start">
         <div class="p-2.5 rounded-2xl bg-slate-50">
@@ -160,7 +168,7 @@
 
     <button
       onclick={() => goto("/merchant/history?filter=views")}
-      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-blue-500/50 transition-all active:scale-95"
+      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-blue-500/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
     >
       <div class="flex justify-between items-start">
         <div class="p-2.5 rounded-2xl bg-slate-50">
@@ -180,7 +188,7 @@
     <!-- NEW 4th Menu Card -->
     <button
       onclick={() => goto("/merchant/menu")}
-      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-orange-500/50 transition-all active:scale-95 group"
+      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-orange-500/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 group duration-300"
     >
       <div class="flex justify-between items-start">
         <div
@@ -202,10 +210,11 @@
     </button>
   </div>
 
-  <!-- Menu Management Section (Collapsible) -->
-
   <!-- Customer Reach Graph -->
-  <div class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
+  <div
+    class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm"
+    in:fly={{ y: 20, duration: 600, delay: 200, easing: cubicOut }}
+  >
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-lg font-bold text-slate-800">Customer Reach</h2>
       <div class="flex gap-1 bg-slate-50 p-1 rounded-xl">
@@ -249,6 +258,7 @@
           d="M0,80 C20,70 40,40 60,50 S80,20 100,30 V100 H0 Z"
           fill="url(#gradient)"
           opacity="0.15"
+          class="animate-pulse duration-[3000ms]"
         />
         <path
           d="M0,80 C20,70 40,40 60,50 S80,20 100,30"
@@ -285,9 +295,15 @@
       </h2>
     </div>
 
-    {#each $activeOffersStore as offer}
+    {#each $activeOffersStore as offer, i}
       <div
-        class="bg-white p-4 rounded-[28px] border border-slate-100 shadow-sm relative overflow-hidden group flex gap-4 transition-all hover:border-primary/30"
+        in:fly={{
+          y: 20,
+          duration: 500,
+          delay: 300 + i * 100,
+          easing: cubicOut,
+        }}
+        class="bg-white p-4 rounded-[28px] border border-slate-100 shadow-sm relative overflow-hidden group flex gap-4 transition-all hover:border-primary/30 hover:shadow-md hover:-translate-y-1 duration-300"
       >
         <!-- Offer Image -->
         <div
@@ -297,7 +313,7 @@
             <img
               src={offer.image}
               alt={offer.item}
-              class="w-full h-full object-cover"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
           {:else}
             <div
@@ -347,7 +363,10 @@
   </div>
 
   <!-- Offers History -->
-  <div class="flex flex-col gap-4 mt-2">
+  <div
+    class="flex flex-col gap-4 mt-2"
+    in:fly={{ y: 20, duration: 600, delay: 500, easing: cubicOut }}
+  >
     <div class="flex items-center justify-between px-1">
       <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
         <History size={18} class="text-slate-400" />
@@ -359,9 +378,9 @@
     <div
       class="bg-white rounded-[28px] border border-slate-100 overflow-hidden"
     >
-      {#each pastOffers as offer}
+      {#each pastOffers as offer, i}
         <div
-          class="p-4 border-b border-slate-50 last:border-0 flex items-center justify-between gap-3"
+          class="p-4 border-b border-slate-50 last:border-0 flex items-center justify-between gap-3 hover:bg-slate-50/50 transition-colors"
         >
           <div class="flex items-center gap-4 flex-1 overflow-hidden">
             <div

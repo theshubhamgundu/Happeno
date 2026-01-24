@@ -21,6 +21,8 @@
     ChevronRight,
   } from "lucide-svelte";
   import { goto } from "$app/navigation";
+  import { fly, fade } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
 
   let businessName = $state("Paradise Biryani");
 
@@ -53,7 +55,10 @@
   }
 </script>
 
-<div class="min-h-screen bg-[#FFF5E1] pb-24">
+<div
+  class="min-h-screen bg-[#FFF5E1] pb-24"
+  in:fade={{ duration: 300, easing: cubicOut }}
+>
   <!-- Header with DP Upload -->
   <header
     class="relative px-6 pt-12 pb-8 flex flex-col items-center gap-4 text-center bg-white rounded-b-[40px] shadow-sm z-10"
@@ -67,7 +72,7 @@
 
     <button
       onclick={() => dpInput.click()}
-      class="relative group w-28 h-28 bg-slate-50 rounded-[36px] border-4 border-white shadow-xl flex items-center justify-center text-primary overflow-hidden cursor-pointer hover:border-primary/30 transition-all"
+      class="relative group w-28 h-28 bg-slate-50 rounded-[36px] border-4 border-white shadow-xl flex items-center justify-center text-primary overflow-hidden cursor-pointer hover:border-primary/30 transition-all active:scale-95"
     >
       {#if merchantDpPreview}
         <img
@@ -109,7 +114,10 @@
 
   <main class="px-6 flex flex-col gap-8 mt-6">
     <!-- Location Section (Detailed) -->
-    <div class="space-y-4">
+    <div
+      class="space-y-4"
+      in:fly={{ y: 20, duration: 500, delay: 100, easing: cubicOut }}
+    >
       <div class="flex items-center justify-between px-1">
         <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
           <div class="p-1.5 rounded-lg bg-orange-50 text-orange-500">
@@ -126,12 +134,10 @@
       </div>
 
       <div
-        class="bg-white p-5 rounded-[28px] border border-border-peach shadow-sm"
+        class="bg-white p-5 rounded-[28px] border border-border-peach shadow-sm hover:shadow-md transition-shadow"
       >
         {#if isEditingLocation}
-          <div
-            class="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2"
-          >
+          <div class="flex flex-col gap-3" in:fly={{ y: 10, duration: 300 }}>
             <Input
               label="Street Address"
               bind:value={street}
@@ -160,7 +166,7 @@
             >
           </div>
         {:else}
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-4" in:fade={{ duration: 200 }}>
             <div class="flex items-start gap-4">
               <div class="p-3 bg-blue-50 text-blue-500 rounded-2xl shrink-0">
                 <Navigation size={24} />
@@ -180,7 +186,7 @@
             </div>
 
             <button
-              class="w-full py-3 bg-slate-50 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-100 transition-colors flex items-center justify-center gap-2"
+              class="w-full py-3 bg-slate-50 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 active:scale-95"
             >
               <MapPin size={14} /> View on Map
             </button>
@@ -190,7 +196,10 @@
     </div>
 
     <!-- Restaurant Timings -->
-    <div class="space-y-4">
+    <div
+      class="space-y-4"
+      in:fly={{ y: 20, duration: 500, delay: 200, easing: cubicOut }}
+    >
       <div class="flex items-center justify-between px-1">
         <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
           <div class="p-1.5 rounded-lg bg-purple-50 text-purple-500">
@@ -207,12 +216,10 @@
       </div>
 
       <div
-        class="bg-white p-5 rounded-[28px] border border-border-peach shadow-sm"
+        class="bg-white p-5 rounded-[28px] border border-border-peach shadow-sm hover:shadow-md transition-shadow"
       >
         {#if isEditingTiming}
-          <div
-            class="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2"
-          >
+          <div class="grid grid-cols-2 gap-4" in:fly={{ y: 10, duration: 300 }}>
             <div class="space-y-2">
               <label
                 class="text-xs font-bold text-slate-500 uppercase tracking-wide ml-1"
@@ -237,7 +244,10 @@
             </div>
           </div>
         {:else}
-          <div class="flex items-center justify-between">
+          <div
+            class="flex items-center justify-between"
+            in:fade={{ duration: 200 }}
+          >
             <div class="flex items-center gap-4">
               <div class="p-3 bg-purple-50 text-purple-500 rounded-2xl">
                 <Clock size={24} />
@@ -264,7 +274,10 @@
     </div>
 
     <!-- Appearance -->
-    <div class="space-y-4">
+    <div
+      class="space-y-4"
+      in:fly={{ y: 20, duration: 500, delay: 300, easing: cubicOut }}
+    >
       <div class="flex items-center justify-between px-1">
         <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
           <div class="p-1.5 rounded-lg bg-pink-50 text-pink-500">
@@ -274,7 +287,7 @@
         </h2>
       </div>
       <button
-        class="w-full bg-white p-5 rounded-[28px] border border-border-peach shadow-sm flex items-center justify-between hover:border-primary/50 transition-colors group"
+        class="w-full bg-white p-5 rounded-[28px] border border-border-peach shadow-sm flex items-center justify-between hover:border-primary/50 transition-colors group active:scale-[0.98] duration-200 scroll-smooth"
       >
         <div class="flex items-center gap-4">
           <div
@@ -292,7 +305,10 @@
     </div>
 
     <!-- Support -->
-    <div class="space-y-4">
+    <div
+      class="space-y-4"
+      in:fly={{ y: 20, duration: 500, delay: 400, easing: cubicOut }}
+    >
       <div class="flex items-center justify-between px-1">
         <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
           <div class="p-1.5 rounded-lg bg-blue-50 text-blue-500">
@@ -305,7 +321,7 @@
         class="bg-white rounded-[28px] border border-border-peach shadow-sm overflow-hidden flex flex-col"
       >
         <button
-          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors"
+          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors active:bg-slate-100"
         >
           <div class="flex items-center gap-4">
             <div class="p-2.5 bg-slate-100 text-slate-500 rounded-xl">
@@ -318,7 +334,7 @@
           <ChevronRight size={18} class="text-slate-300" />
         </button>
         <button
-          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors"
+          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors active:bg-slate-100"
         >
           <div class="flex items-center gap-4">
             <div class="p-2.5 bg-slate-100 text-slate-500 rounded-xl">
@@ -329,7 +345,7 @@
           <ChevronRight size={18} class="text-slate-300" />
         </button>
         <button
-          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition-colors"
+          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition-colors active:bg-slate-100"
         >
           <div class="flex items-center gap-4">
             <div class="p-2.5 bg-slate-100 text-slate-500 rounded-xl">
@@ -345,7 +361,10 @@
     </div>
 
     <!-- About -->
-    <div class="space-y-4">
+    <div
+      class="space-y-4"
+      in:fly={{ y: 20, duration: 500, delay: 500, easing: cubicOut }}
+    >
       <div class="flex items-center justify-between px-1">
         <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
           <div class="p-1.5 rounded-lg bg-slate-100 text-slate-500">
@@ -358,7 +377,7 @@
         class="bg-white rounded-[28px] border border-border-peach shadow-sm overflow-hidden flex flex-col"
       >
         <button
-          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors"
+          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors active:bg-slate-100"
         >
           <div class="flex items-center gap-4">
             <div class="p-2.5 bg-slate-100 text-slate-500 rounded-xl">
@@ -371,7 +390,7 @@
           <ChevronRight size={18} class="text-slate-300" />
         </button>
         <button
-          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition-colors"
+          class="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition-colors active:bg-slate-100"
         >
           <div class="flex items-center gap-4">
             <div class="p-2.5 bg-slate-100 text-slate-500 rounded-xl">
@@ -386,7 +405,10 @@
       </div>
     </div>
 
-    <div class="pt-8 mb-4">
+    <div
+      class="pt-8 mb-4"
+      in:fly={{ y: 20, duration: 500, delay: 600, easing: cubicOut }}
+    >
       <Button
         variant="outline"
         onclick={() => goto("/")}

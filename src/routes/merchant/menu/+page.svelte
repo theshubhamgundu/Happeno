@@ -19,6 +19,8 @@
         activeOffersStore,
         type MenuItem,
     } from "$lib/stores/merchant";
+    import { fly, fade, scale, slide } from "svelte/transition";
+    import { quartOut, elasticOut, cubicOut } from "svelte/easing";
 
     // --- Menu Management ---
     let showAddForm = $state(false);
@@ -106,13 +108,16 @@
     }
 </script>
 
-<div class="min-h-screen bg-[#FFF5E1] pb-24">
+<div
+    class="min-h-screen bg-[#FFF5E1] pb-24"
+    in:fade={{ duration: 300, easing: cubicOut }}
+>
     <header
         class="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4 flex items-center gap-4 shadow-sm"
     >
         <button
             onclick={() => goto("/merchant/dashboard")}
-            class="p-2 -ml-2 text-slate-500 hover:text-slate-800 rounded-full hover:bg-slate-50 transition-all"
+            class="p-2 -ml-2 text-slate-500 hover:text-slate-800 rounded-full hover:bg-slate-50 transition-all active:scale-90 duration-200"
         >
             <ChevronLeft size={24} />
         </button>
@@ -138,14 +143,16 @@
             <input
                 type="text"
                 placeholder="Search items..."
-                class="w-full pl-12 pr-4 py-3 bg-white rounded-xl border border-slate-200 outline-none focus:border-primary font-medium text-slate-700 placeholder:text-slate-400 shadow-sm"
+                class="w-full pl-12 pr-4 py-3 bg-white rounded-xl border border-slate-200 outline-none focus:border-primary font-medium text-slate-700 placeholder:text-slate-400 shadow-sm transition-all focus:shadow-md"
             />
         </div>
 
         <!-- ADD ITEM FORM -->
         {#if showAddForm}
             <div
-                class="bg-white p-5 rounded-[32px] border-2 border-primary/20 shadow-lg shadow-primary/5 space-y-4 animate-in fade-in zoom-in-95 duration-300"
+                class="bg-white p-5 rounded-[32px] border-2 border-primary/20 shadow-lg shadow-primary/5 space-y-4"
+                in:slide={{ axis: "y", duration: 400, easing: cubicOut }}
+                out:slide={{ axis: "y", duration: 300 }}
             >
                 <div class="flex justify-between items-center">
                     <div
@@ -163,7 +170,7 @@
                 <div class="flex gap-4">
                     <button
                         onclick={() => fileInput.click()}
-                        class="w-24 h-24 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center shrink-0 overflow-hidden hover:border-primary/50 transition-colors"
+                        class="w-24 h-24 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center shrink-0 overflow-hidden hover:border-primary/50 transition-colors active:scale-95"
                     >
                         {#if newItemPreview}
                             <img
@@ -209,22 +216,33 @@
                 >
             </div>
         {:else}
-            <Button
-                variant="outline"
-                onclick={() => (showAddForm = true)}
-                class="w-full py-4 border-dashed border-2 border-slate-300 text-slate-500 hover:text-primary hover:border-primary/50 hover:bg-primary/5"
-            >
-                <Plus size={20} class="mr-2" /> Add New Item
-            </Button>
+            <div in:fade={{ duration: 200 }}>
+                <Button
+                    variant="outline"
+                    onclick={() => (showAddForm = true)}
+                    class="w-full py-4 border-dashed border-2 border-slate-300 text-slate-500 hover:text-primary hover:border-primary/50 hover:bg-primary/5 active:scale-[0.98] transition-all"
+                >
+                    <Plus size={20} class="mr-2" /> Add New Item
+                </Button>
+            </div>
         {/if}
 
         <!-- OFFER CREATION MODAL / OVERLAY -->
         {#if selectedItemForOffer}
             <div
-                class="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in"
+                class="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-4 bg-black/40 backdrop-blur-sm"
+                in:fade={{ duration: 200 }}
+                out:fade={{ duration: 200 }}
             >
                 <div
-                    class="bg-white w-full max-w-sm p-6 rounded-[32px] shadow-2xl space-y-5 animate-in slide-in-from-bottom-10 sm:zoom-in-95"
+                    class="bg-white w-full max-w-sm p-6 rounded-[32px] shadow-2xl space-y-5"
+                    in:scale={{
+                        start: 0.9,
+                        duration: 400,
+                        easing: elasticOut,
+                        opacity: 0,
+                    }}
+                    out:scale={{ start: 0.95, duration: 200, opacity: 0 }}
                 >
                     <div class="flex justify-between items-start">
                         <div>
@@ -241,7 +259,7 @@
                         </div>
                         <button
                             onclick={() => (selectedItemForOffer = null)}
-                            class="p-2 bg-slate-100 rounded-full hover:bg-slate-200 text-slate-500"
+                            class="p-2 bg-slate-100 rounded-full hover:bg-slate-200 text-slate-500 transition-colors"
                         >
                             <Trash2 size={16} class="rotate-45" />
                             <!-- Close Icon Hack -->
@@ -262,7 +280,7 @@
                                         onclick={() => (offerDuration = dur)}
                                         class="flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all {offerDuration ===
                                         dur
-                                            ? 'border-primary bg-primary/5 text-primary'
+                                            ? 'border-primary bg-primary/5 text-primary scale-105 shadow-sm'
                                             : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200'}"
                                     >
                                         {dur}
@@ -287,7 +305,7 @@
                                             (offerDiscountType = "percent")}
                                         class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {offerDiscountType ===
                                         'percent'
-                                            ? 'bg-white shadow-sm text-slate-800'
+                                            ? 'bg-white shadow-sm text-slate-800 scale-105'
                                             : 'text-slate-400'}">%</button
                                     >
                                     <button
@@ -295,7 +313,7 @@
                                             (offerDiscountType = "price")}
                                         class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {offerDiscountType ===
                                         'price'
-                                            ? 'bg-white shadow-sm text-slate-800'
+                                            ? 'bg-white shadow-sm text-slate-800 scale-105'
                                             : 'text-slate-400'}">₹</button
                                     >
                                 </div>
@@ -307,7 +325,7 @@
                                         "percent"
                                             ? "Percentage (e.g. 50)"
                                             : "Amount off (e.g. 100)"}
-                                        class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:border-primary outline-none"
+                                        class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:border-primary outline-none transition-all"
                                     />
                                 </div>
                             </div>
@@ -316,7 +334,7 @@
 
                     <Button
                         onclick={publishOffer}
-                        class="w-full py-4 text-base font-bold shadow-lg shadow-primary/20"
+                        class="w-full py-4 text-base font-bold shadow-lg shadow-primary/20 active:scale-95 transition-transform"
                     >
                         <Zap size={20} class="mr-2 fill-white" /> Publish Offer
                     </Button>
@@ -325,9 +343,15 @@
         {/if}
 
         <div class="grid grid-cols-1 gap-4">
-            {#each $menuItemsStore as item (item.id)}
+            {#each $menuItemsStore as item, i (item.id)}
                 <div
-                    class="bg-white p-4 rounded-[24px] border border-slate-100 shadow-sm flex gap-4 transition-all hover:border-primary/30 group"
+                    in:fly={{
+                        y: 20,
+                        duration: 400,
+                        delay: i * 100,
+                        easing: quartOut,
+                    }}
+                    class="bg-white p-4 rounded-[24px] border border-slate-100 shadow-sm flex gap-4 transition-all hover:border-primary/30 group hover:shadow-md hover:-translate-y-1 duration-300"
                 >
                     <div
                         class="w-24 h-24 bg-slate-100 rounded-2xl shrink-0 overflow-hidden"
@@ -336,7 +360,7 @@
                             <img
                                 src={item.image}
                                 alt={item.name}
-                                class="w-full h-full object-cover"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                         {:else}
                             <div
@@ -358,14 +382,14 @@
                                 <div class="flex gap-1 -mr-2 -mt-2">
                                     <button
                                         onclick={() => openOfferForm(item)}
-                                        class="p-2 text-slate-300 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
+                                        class="p-2 text-slate-300 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors active:scale-90"
                                         title="Create Offer"
                                     >
                                         <Zap size={18} />
                                     </button>
                                     <button
                                         onclick={() => deleteItem(item.id)}
-                                        class="p-2 text-slate-300 hover:text-urgency hover:bg-urgency/5 rounded-lg transition-colors"
+                                        class="p-2 text-slate-300 hover:text-urgency hover:bg-urgency/5 rounded-lg transition-colors active:scale-90"
                                         title="Delete Item"
                                     >
                                         <Trash2 size={18} />
