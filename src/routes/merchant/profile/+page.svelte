@@ -321,6 +321,7 @@
         class="bg-white rounded-[28px] border border-border-peach shadow-sm overflow-hidden flex flex-col"
       >
         <button
+          onclick={() => goto("/merchant/faq")}
           class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors active:bg-slate-100"
         >
           <div class="flex items-center gap-4">
@@ -377,6 +378,7 @@
         class="bg-white rounded-[28px] border border-border-peach shadow-sm overflow-hidden flex flex-col"
       >
         <button
+          onclick={() => goto("/legal/privacy")}
           class="w-full p-5 flex items-center justify-between hover:bg-slate-50 border-b border-slate-50 transition-colors active:bg-slate-100"
         >
           <div class="flex items-center gap-4">
@@ -390,6 +392,7 @@
           <ChevronRight size={18} class="text-slate-300" />
         </button>
         <button
+          onclick={() => goto("/legal/terms")}
           class="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition-colors active:bg-slate-100"
         >
           <div class="flex items-center gap-4">
