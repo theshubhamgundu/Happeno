@@ -1,44 +1,42 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import Logo from '$lib/components/Logo.svelte';
-  import Input from '$lib/components/Input.svelte';
-  import Button from '$lib/components/Button.svelte';
-  import { supabase } from '$lib/supabase';
-  import { goto } from '$app/navigation';
+  import { onMount } from "svelte";
+  import Logo from "$lib/components/Logo.svelte";
+  import Button from "$lib/components/Button.svelte";
+  import { goto } from "$app/navigation";
 
-  let phone = $state('');
-  let otp = $state('');
-  let step = $state<'phone' | 'otp'>('phone');
+  let phone = $state("");
+  let otp = $state("");
+  let step = $state<"phone" | "otp">("phone");
   let loading = $state(false);
-  let error = $state('');
+  let error = $state("");
 
   async function handleSendOTP() {
     if (!phone || phone.length < 10) {
-      error = 'Please enter a valid phone number';
+      error = "Please enter a valid phone number";
       return;
     }
-    
+
     loading = true;
-    error = '';
-    
+    error = "";
+
     setTimeout(() => {
-      step = 'otp';
+      step = "otp";
       loading = false;
     }, 800);
   }
 
   async function handleVerifyOTP() {
     if (!otp || otp.length < 6) {
-      error = 'Please enter the 6-digit OTP';
+      error = "Please enter the 6-digit OTP";
       return;
     }
 
     loading = true;
-    error = '';
+    error = "";
 
     setTimeout(() => {
       loading = false;
-      goto('/user/onboarding');
+      goto("/user/onboarding");
     }, 800);
   }
 </script>
@@ -57,21 +55,29 @@
 
   <!-- Main Content -->
   <main class="flex-1 px-6 flex flex-col">
-    {#if step === 'phone'}
+    {#if step === "phone"}
       <div class="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
         <div class="space-y-8">
           <div class="text-center">
-            <h2 class="text-2xl font-black text-text-primary mb-2">Login or Sign up</h2>
-            <p class="text-sm text-text-muted">Enter your phone number to continue</p>
+            <h2 class="text-2xl font-black text-text-primary mb-2">
+              Login or Sign up
+            </h2>
+            <p class="text-sm text-text-muted">
+              Enter your phone number to continue
+            </p>
           </div>
 
           <div class="space-y-4">
-            <div class="flex items-center gap-3 p-4 bg-surface border border-border-dark rounded-2xl shadow-sm">
-              <div class="flex items-center gap-2 pr-3 border-r border-border-dark">
+            <div
+              class="flex items-center gap-3 p-4 bg-surface border border-border-dark rounded-2xl shadow-sm"
+            >
+              <div
+                class="flex items-center gap-2 pr-3 border-r border-border-dark"
+              >
                 <span class="text-lg">🇮🇳</span>
                 <span class="text-sm font-bold text-text-secondary">+91</span>
               </div>
-              <input 
+              <input
                 bind:value={phone}
                 type="tel"
                 placeholder="Enter phone number"
@@ -83,19 +89,34 @@
               <p class="text-sm text-urgency font-medium">{error}</p>
             {/if}
 
-            <Button onclick={handleSendOTP} {loading} class="w-full py-4 text-base font-bold bg-primary text-white rounded-2xl shadow-lg shadow-primary/20">
+            <Button
+              onclick={handleSendOTP}
+              {loading}
+              class="w-full py-4 text-base font-bold bg-primary text-white rounded-2xl shadow-lg shadow-primary/20"
+            >
               Continue
             </Button>
 
-            <button 
-              onclick={() => { phone = '9999900000'; handleSendOTP(); setTimeout(() => { otp = '123456'; handleVerifyOTP(); }, 1000); }} 
+            <button
+              onclick={() => {
+                phone = "9999900000";
+                handleSendOTP();
+                setTimeout(() => {
+                  otp = "123456";
+                  handleVerifyOTP();
+                }, 1000);
+              }}
               class="w-full py-3 text-sm font-bold text-primary"
             >
               Skip to Demo →
             </button>
 
             <p class="text-[11px] text-center text-text-muted leading-relaxed">
-              By continuing, you agree to our <span class="text-text-primary underline">Terms of Service</span> and <span class="text-text-primary underline">Privacy Policy</span>
+              By continuing, you agree to our <span
+                class="text-text-primary underline">Terms of Service</span
+              >
+              and
+              <span class="text-text-primary underline">Privacy Policy</span>
             </p>
           </div>
         </div>
@@ -104,12 +125,16 @@
       <div class="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
         <div class="space-y-8">
           <div class="text-center">
-            <h2 class="text-2xl font-black text-text-primary mb-2">Verify your number</h2>
-            <p class="text-sm text-text-muted">Enter the 6-digit code sent to +91 {phone}</p>
+            <h2 class="text-2xl font-black text-text-primary mb-2">
+              Verify your number
+            </h2>
+            <p class="text-sm text-text-muted">
+              Enter the 6-digit code sent to +91 {phone}
+            </p>
           </div>
 
           <div class="space-y-4">
-            <input 
+            <input
               bind:value={otp}
               type="number"
               placeholder="••••••"
@@ -118,17 +143,26 @@
             />
 
             {#if error}
-              <p class="text-sm text-urgency font-medium text-center">{error}</p>
+              <p class="text-sm text-urgency font-medium text-center">
+                {error}
+              </p>
             {/if}
 
-            <Button onclick={handleVerifyOTP} {loading} class="w-full py-4 text-base font-bold bg-primary text-white rounded-2xl shadow-lg shadow-primary/20">
+            <Button
+              onclick={handleVerifyOTP}
+              {loading}
+              class="w-full py-4 text-base font-bold bg-primary text-white rounded-2xl shadow-lg shadow-primary/20"
+            >
               Verify & Continue
             </Button>
 
             <div class="flex items-center justify-center gap-4 text-sm">
               <button class="font-bold text-primary">Resend OTP</button>
               <span class="text-text-muted">•</span>
-              <button onclick={() => step = 'phone'} class="font-bold text-text-muted">Change Number</button>
+              <button
+                onclick={() => (step = "phone")}
+                class="font-bold text-text-muted">Change Number</button
+              >
             </div>
           </div>
         </div>

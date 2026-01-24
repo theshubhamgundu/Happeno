@@ -112,7 +112,7 @@
   });
 </script>
 
-<div class="min-h-screen bg-bg-app pb-24">
+<div class="min-h-screen bg-bg-app pb-24 transition-colors duration-300">
   <header class="p-8">
     <div class="flex flex-col gap-1">
       <h1
@@ -133,7 +133,7 @@
   <main class="px-6 flex flex-col gap-6">
     {#each filteredHistory as item}
       <div
-        class="bg-white p-6 rounded-[32px] border border-border-peach flex flex-col gap-4 relative overflow-hidden group hover:border-primary/30 transition-all"
+        class="bg-surface p-6 rounded-[32px] border border-border-peach flex flex-col gap-4 relative overflow-hidden group hover:border-primary/30 transition-all shadow-sm"
       >
         <div class="flex justify-between items-start">
           <div class="flex flex-col gap-1">
@@ -200,14 +200,14 @@
               ? 'text-success'
               : item.status === 'Expiring'
                 ? 'text-urgency'
-                : 'text-slate-400'}"
+                : 'text-text-muted'}"
           >
             <div
               class="w-1.5 h-1.5 rounded-full {item.status === 'Active'
                 ? 'bg-success animate-pulse'
                 : item.status === 'Expiring'
                   ? 'bg-urgency animate-pulse'
-                  : 'bg-slate-400'}"
+                  : 'bg-text-muted'}"
             ></div>
             {item.status}
             {#if item.status !== "Completed" && item.expiry}
@@ -225,7 +225,7 @@
       <div
         class="py-20 flex flex-col items-center justify-center text-center opacity-50 px-12"
       >
-        <HistoryIcon size={64} class="mb-4" />
+        <HistoryIcon size={64} class="mb-4 text-text-muted" />
         <p class="font-bold text-text-secondary">
           No offers found for "{filter}".
         </p>
