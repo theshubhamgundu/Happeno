@@ -99,6 +99,7 @@
           {cat.name}
         </button>
       {/each}
+      </div>
     </div>
   </header>
 

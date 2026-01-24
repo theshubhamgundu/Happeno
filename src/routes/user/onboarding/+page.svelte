@@ -17,7 +17,7 @@
   let debounceTimer: any;
   let usingFallback = $state(false);
 
-  import { PUBLIC_OLA_MAP_API_KEY as OLA_API_KEY } from '$env/static/public';
+  import { PUBLIC_OLA_MAPS_API_KEY as OLA_API_KEY } from '$env/static/public';
 
   // Ola Maps SDK global
   declare const OlaMaps: any;
