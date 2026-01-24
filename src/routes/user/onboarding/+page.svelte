@@ -81,7 +81,6 @@
 
   function initOlaMaps() {
     try {
-      // Correct Ola Maps Web SDK initialization pattern
       const olaMaps = new OlaMaps({
         apiKey: OLA_API_KEY
       });
@@ -93,9 +92,19 @@
         zoom: 15
       });
 
+      // Handle Map Load Success
       map.on('load', () => {
-        console.log("Ola Map loaded");
+        console.log("Ola Map loaded successfully");
         handleCurrentLocation();
+      });
+
+      // Catch Styling/Tiles errors (like 403 Forbidden)
+      map.on('error', (e: any) => {
+        console.warn("Ola Maps Style Error (likely 403):", e);
+        if (!usingFallback) {
+          usingFallback = true;
+          initLeaflet();
+        }
       });
 
       map.on('movestart', () => {
@@ -105,10 +114,11 @@
 
       map.on('moveend', async () => {
         isDragging = false;
-        const center = map.getCenter(); // {lng, lat} for Ola/MapLibre
+        const center = map.getCenter();
         
         try {
           const res = await fetch(`https://api.olamaps.io/places/v1/reverse-geocode?latlng=${center.lat},${center.lng}&api_key=${OLA_API_KEY}`);
+          if (res.status === 403) throw new Error("403 Forbidden");
           const data = await res.json();
           if (data.results && data.results.length > 0) {
             const first = data.results[0];
@@ -116,11 +126,15 @@
             subAddress = first.formatted_address.split(',').slice(1).join(', ').trim();
           }
         } catch (e) {
-          console.error("Reverse geocode error", e);
+          console.error("Ola Reverse Geocode failed:", e);
+          // Fallback reverse geocode if Ola fails
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${center.lat}&lon=${center.lng}`);
+          const data = await res.json();
+          address = data.display_name.split(',')[0];
         }
       });
     } catch (err) {
-      console.error("Ola Maps Init Error:", err);
+      console.error("Ola Maps Critical Init Error:", err);
       usingFallback = true;
       initLeaflet();
     }
