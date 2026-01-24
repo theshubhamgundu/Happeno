@@ -49,7 +49,7 @@
     { 
       name: 'Pizza Hut', 
       rating: 4.5, 
-      time: '40-45 mins', 
+      distance: '2.4 km', 
       cuisines: 'Pizzas', 
       area: 'Kachiguda',
       offer: 'ITEMS AT ₹59',
@@ -59,7 +59,7 @@
     { 
       name: 'Imperial Kitchen', 
       rating: 4.3, 
-      time: '30-35 mins', 
+      distance: '1.8 km', 
       cuisines: 'Biryani, Chinese, Indian...', 
       area: 'Redhills',
       offer: '40% OFF UPTO ₹80',
@@ -69,7 +69,7 @@
     { 
       name: 'Zomoz - The Momo', 
       rating: 4.2, 
-      time: '45-50 mins', 
+      distance: '3.1 km', 
       cuisines: 'Momos, Chinese', 
       area: 'Masab Tank',
       offer: '50% OFF UPTO ₹100',
@@ -79,7 +79,7 @@
     { 
       name: 'McDonalds', 
       rating: 4.4, 
-      time: '25-30 mins', 
+      distance: '0.9 km', 
       cuisines: 'Burgers, Fast Food', 
       area: 'Mehdipatnam',
       offer: 'FREE DELIVERY',
@@ -92,7 +92,7 @@
     { 
       name: 'Prasuma Momo Kitchen', 
       rating: 4.3, 
-      time: '40-45 mins', 
+      distance: '2.2 km', 
       cuisines: 'Chinese, Pan-Asian, Beverages...', 
       area: 'Banjara Hills',
       offer: '60% OFF UPTO ₹120',
@@ -102,7 +102,7 @@
     { 
       name: 'Al Taza', 
       rating: 4.5, 
-      time: '25-30 mins', 
+      distance: '1.1 km', 
       cuisines: 'Arabian, Juices, Beverages', 
       area: 'Mehdipatnam',
       offer: null,
@@ -112,7 +112,7 @@
     { 
       name: 'Paradise Biryani', 
       rating: 4.6, 
-      time: '35-40 mins', 
+      distance: '3.5 km', 
       cuisines: 'Biryani, North Indian', 
       area: 'Secunderabad',
       offer: 'FLAT ₹50 OFF',
@@ -122,7 +122,7 @@
     { 
       name: 'The Rameshwaram Cafe', 
       rating: 4.4, 
-      time: '30-35 mins', 
+      distance: '1.5 km', 
       cuisines: 'South Indian, Dosa', 
       area: 'Jubilee Hills',
       offer: '20% OFF',
@@ -240,7 +240,7 @@
                 <div class="flex items-center gap-0.5 px-1.5 py-0.5 bg-success text-white rounded font-bold">
                   <Star size={10} fill="white" /> {restaurant.rating}
                 </div>
-                <span class="text-text-muted font-medium">• {restaurant.time}</span>
+                <span class="text-text-muted font-medium">• {restaurant.distance}</span>
               </div>
               <p class="text-[10px] text-text-muted line-clamp-1">{restaurant.cuisines}</p>
               <p class="text-[10px] text-text-muted font-medium">{restaurant.area}</p>
@@ -280,7 +280,11 @@
       </div>
 
       <div class="space-y-4">
-        <h3 class="text-lg font-black text-text-primary">Popular Order Food Online restaurants near me</h3>
+        {#if activeTab === 'online'}
+          <h3 class="text-lg font-black text-text-primary">Grab exciting offers for you</h3>
+        {:else}
+          <h3 class="text-lg font-black text-text-primary">Explore Popular restaurants near me</h3>
+        {/if}
         <button class="flex items-center gap-2 px-4 py-2 bg-surface border border-border-dark rounded-full text-xs font-bold shadow-sm">
           Sort By <ChevronDown size={14} />
         </button>
@@ -307,7 +311,7 @@
                 <div class="flex items-center gap-0.5 px-1.5 py-0.5 bg-success text-white rounded font-bold">
                   <Star size={10} fill="white" /> {restaurant.rating}
                 </div>
-                <span class="text-text-muted font-medium">• {restaurant.time}</span>
+                <span class="text-text-muted font-medium">• {restaurant.distance}</span>
               </div>
               <p class="text-[10px] text-text-muted line-clamp-1">{restaurant.cuisines}</p>
               <p class="text-[10px] text-text-muted font-medium">{restaurant.area}</p>
