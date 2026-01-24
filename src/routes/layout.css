@@ -1,19 +1,26 @@
 @import 'tailwindcss';
 
 :root {
-  --color-primary: #EC1C79;
+  /* Branding Colors (Updated from Main) */
+  --color-primary: #FF107C;
   --color-primary-dark: #C51662;
+  --color-secondary: #008891;
   --color-urgency: #FF9F1C;
   --color-success: #22C55E;
 
-  /* Light Mode (Original) */
+  /* Light Mode */
   --color-bg-app: #FFF3E6;
   --color-surface: #FFFFFF;
-  --color-highlight: #FFE4EF;
+  --color-surface-lighter: #FCF4ED;
+  /* From Main */
+  --color-highlight: #FF107C15;
+  /* From Main */
   --color-text-primary: #1A1A1A;
   --color-text-secondary: #4A2F2F;
   --color-text-muted: #7B4B5A;
   --color-border-peach: #FFD6C9;
+  --color-border-dark: #E6D5C3;
+  /* From Main */
   --color-input-rose: #F2B8C6;
 }
 
@@ -21,32 +28,36 @@
   /* Dark Mode (Black & Silver) */
   --color-bg-app: #000000;
   --color-surface: #111111;
-  /* Very dark gray, almost black */
+  --color-surface-lighter: #1A1A1A;
+  /* Dark Equiv */
   --color-highlight: #222222;
-  /* Slightly lighter for inputs/highlights */
   --color-text-primary: #E0E0E0;
-  /* Bright Silver/White */
   --color-text-secondary: #B0B0B0;
-  /* Standard Silver */
   --color-text-muted: #666666;
-  /* Darker Gray */
   --color-border-peach: #333333;
-  /* Dark Gray Border */
+  --color-border-dark: #444444;
+  /* Dark Equiv */
   --color-input-rose: #1A1A1A;
 }
 
 @theme {
   --color-primary: var(--color-primary);
   --color-primary-dark: var(--color-primary-dark);
+  --color-secondary: var(--color-secondary);
   --color-urgency: var(--color-urgency);
   --color-success: var(--color-success);
+
   --color-bg-app: var(--color-bg-app);
   --color-surface: var(--color-surface);
+  --color-surface-lighter: var(--color-surface-lighter);
   --color-highlight: var(--color-highlight);
+
   --color-text-primary: var(--color-text-primary);
   --color-text-secondary: var(--color-text-secondary);
   --color-text-muted: var(--color-text-muted);
+
   --color-border-peach: var(--color-border-peach);
+  --color-border-dark: var(--color-border-dark);
   --color-input-rose: var(--color-input-rose);
 
   --font-sans: 'Inter', system-ui, sans-serif;
@@ -78,9 +89,27 @@
   }
 
   .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/20;
+    @apply bg-white/60 backdrop-blur-xl border border-white/40;
   }
 
+  /* Utilities from Main */
+  .gradient-primary {
+    background: linear-gradient(135deg, #FF107C 0%, #BA14FF 100%);
+  }
+
+  .gradient-cyber {
+    background: linear-gradient(135deg, #008891 0%, #006AFF 100%);
+  }
+
+  .text-glow {
+    text-shadow: 0 4px 12px rgba(255, 16, 124, 0.2);
+  }
+
+  .card-glow {
+    box-shadow: 0 12px 40px -12px rgba(74, 47, 47, 0.15);
+  }
+
+  /* Utilities from Merchant */
   .card-shadow {
     box-shadow: 0 4px 20px -2px rgba(236, 28, 121, 0.1), 0 2px 10px -2px rgba(236, 28, 121, 0.05);
   }
