@@ -1,10 +1,12 @@
 @import 'tailwindcss';
 
-@theme {
+:root {
   --color-primary: #EC1C79;
   --color-primary-dark: #C51662;
   --color-urgency: #FF9F1C;
   --color-success: #22C55E;
+
+  /* Light Mode (Original) */
   --color-bg-app: #FFF3E6;
   --color-surface: #FFFFFF;
   --color-highlight: #FFE4EF;
@@ -13,7 +15,40 @@
   --color-text-muted: #7B4B5A;
   --color-border-peach: #FFD6C9;
   --color-input-rose: #F2B8C6;
-  
+}
+
+.dark {
+  /* Dark Mode (Black & Silver) */
+  --color-bg-app: #000000;
+  --color-surface: #111111;
+  /* Very dark gray, almost black */
+  --color-highlight: #222222;
+  /* Slightly lighter for inputs/highlights */
+  --color-text-primary: #E0E0E0;
+  /* Bright Silver/White */
+  --color-text-secondary: #B0B0B0;
+  /* Standard Silver */
+  --color-text-muted: #666666;
+  /* Darker Gray */
+  --color-border-peach: #333333;
+  /* Dark Gray Border */
+  --color-input-rose: #1A1A1A;
+}
+
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-urgency: var(--color-urgency);
+  --color-success: var(--color-success);
+  --color-bg-app: var(--color-bg-app);
+  --color-surface: var(--color-surface);
+  --color-highlight: var(--color-highlight);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-border-peach: var(--color-border-peach);
+  --color-input-rose: var(--color-input-rose);
+
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-heading: 'Outfit', sans-serif;
   --font-brand: 'Fredoka', sans-serif;
@@ -26,7 +61,12 @@
     min-height: 100vh;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading font-bold;
   }
 }
@@ -36,11 +76,11 @@
     @apply font-brand text-primary;
     letter-spacing: -0.02em;
   }
-  
+
   .glass {
     @apply bg-white/70 backdrop-blur-md border border-white/20;
   }
-  
+
   .card-shadow {
     box-shadow: 0 4px 20px -2px rgba(236, 28, 121, 0.1), 0 2px 10px -2px rgba(236, 28, 121, 0.05);
   }
@@ -48,6 +88,7 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;

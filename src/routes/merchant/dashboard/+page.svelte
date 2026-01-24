@@ -74,13 +74,13 @@
 </script>
 
 <div
-  class="px-4 py-6 pb-32 flex flex-col gap-6 bg-[#FFF5E1] min-h-screen"
+  class="px-4 py-6 pb-32 flex flex-col gap-6 bg-bg-app min-h-screen transition-colors duration-300"
   in:fade={{ duration: 300 }}
 >
   <!-- Header with generic add -->
   <header class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+      <h1 class="text-2xl font-bold text-text-primary flex items-center gap-2">
         <LayoutDashboard class="text-primary" size={24} />
         Dashboard
       </h1>
@@ -96,14 +96,14 @@
 
         <a
           href="/merchant/history"
-          class="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-primary hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5 transition-all shadow-sm active:scale-95 duration-200"
+          class="p-2.5 bg-surface border border-border-peach rounded-xl text-text-secondary hover:text-primary hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5 transition-all shadow-sm active:scale-95 duration-200"
           title="History"
         >
           <History size={20} />
         </a>
         <a
           href="/merchant/profile"
-          class="p-1 rounded-full border border-slate-200 hover:border-primary/50 hover:shadow-md transition-all shadow-sm overflow-hidden w-10 h-10 flex items-center justify-center bg-white active:scale-95 duration-200"
+          class="p-1 rounded-full border border-border-peach hover:border-primary/50 hover:shadow-md transition-all shadow-sm overflow-hidden w-10 h-10 flex items-center justify-center bg-surface active:scale-95 duration-200"
           title="Profile"
         >
           {#if $profileStore.image}
@@ -113,7 +113,7 @@
               class="w-full h-full object-cover rounded-full"
             />
           {:else}
-            <User size={20} class="text-slate-500" />
+            <User size={20} class="text-text-secondary" />
           {/if}
         </a>
       </div>
@@ -127,20 +127,20 @@
   >
     <button
       onclick={() => goto("/merchant/history?filter=active")}
-      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-primary/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
+      class="text-left bg-surface p-4 rounded-3xl border border-border-peach shadow-sm flex flex-col gap-3 hover:border-primary/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
     >
       <div class="flex justify-between items-start">
-        <div class="p-2.5 rounded-2xl bg-slate-50">
+        <div class="p-2.5 rounded-2xl bg-highlight">
           <Zap size={18} class="text-primary" />
         </div>
       </div>
       <div>
         <div
-          class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-1 truncate"
+          class="text-text-secondary text-xs font-bold uppercase tracking-wide mb-1 truncate"
         >
           Active Offers
         </div>
-        <div class="text-2xl font-black text-slate-800 truncate">
+        <div class="text-2xl font-black text-text-primary truncate">
           {$activeOffersStore.length}
         </div>
       </div>
@@ -148,62 +148,62 @@
 
     <button
       onclick={() => goto("/merchant/history?filter=expiring")}
-      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-urgency/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
+      class="text-left bg-surface p-4 rounded-3xl border border-border-peach shadow-sm flex flex-col gap-3 hover:border-urgency/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
     >
       <div class="flex justify-between items-start">
-        <div class="p-2.5 rounded-2xl bg-slate-50">
+        <div class="p-2.5 rounded-2xl bg-highlight">
           <Clock size={18} class="text-urgency" />
         </div>
       </div>
       <div>
         <div
-          class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-1 truncate"
+          class="text-text-secondary text-xs font-bold uppercase tracking-wide mb-1 truncate"
         >
           Expiring Soon
         </div>
-        <div class="text-2xl font-black text-slate-800 truncate">1</div>
+        <div class="text-2xl font-black text-text-primary truncate">1</div>
         <div class="text-[10px] font-bold text-urgency mt-1">in 24 hours</div>
       </div>
     </button>
 
     <button
       onclick={() => goto("/merchant/history?filter=views")}
-      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-blue-500/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
+      class="text-left bg-surface p-4 rounded-3xl border border-border-peach shadow-sm flex flex-col gap-3 hover:border-blue-500/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
     >
       <div class="flex justify-between items-start">
-        <div class="p-2.5 rounded-2xl bg-slate-50">
+        <div class="p-2.5 rounded-2xl bg-highlight">
           <Eye size={18} class="text-blue-500" />
         </div>
       </div>
       <div>
         <div
-          class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-1 truncate"
+          class="text-text-secondary text-xs font-bold uppercase tracking-wide mb-1 truncate"
         >
           Total Views
         </div>
-        <div class="text-2xl font-black text-slate-800 truncate">12,450</div>
+        <div class="text-2xl font-black text-text-primary truncate">12,450</div>
       </div>
     </button>
 
     <!-- NEW 4th Menu Card -->
     <button
       onclick={() => goto("/merchant/menu")}
-      class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-3 hover:border-orange-500/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 group duration-300"
+      class="text-left bg-surface p-4 rounded-3xl border border-border-peach shadow-sm flex flex-col gap-3 hover:border-orange-500/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 group duration-300"
     >
       <div class="flex justify-between items-start">
         <div
-          class="p-2.5 rounded-2xl bg-slate-50 group-hover:bg-orange-50 transition-colors"
+          class="p-2.5 rounded-2xl bg-highlight group-hover:bg-orange-50 transition-colors"
         >
           <UtensilsCrossed size={18} class="text-orange-500" />
         </div>
       </div>
       <div>
         <div
-          class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-1 truncate"
+          class="text-text-secondary text-xs font-bold uppercase tracking-wide mb-1 truncate"
         >
           Your Menu
         </div>
-        <div class="text-2xl font-black text-slate-800 truncate">
+        <div class="text-2xl font-black text-text-primary truncate">
           {$menuItemsStore.length}
         </div>
       </div>
@@ -212,17 +212,17 @@
 
   <!-- Customer Reach Graph -->
   <div
-    class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm"
+    class="bg-surface p-6 rounded-[32px] border border-border-peach shadow-sm"
     in:fly={{ y: 20, duration: 600, delay: 200, easing: cubicOut }}
   >
     <div class="flex justify-between items-center mb-6">
-      <h2 class="text-lg font-bold text-slate-800">Customer Reach</h2>
-      <div class="flex gap-1 bg-slate-50 p-1 rounded-xl">
+      <h2 class="text-lg font-bold text-text-primary">Customer Reach</h2>
+      <div class="flex gap-1 bg-highlight p-1 rounded-xl">
         <button
           class="px-3 py-1 text-[10px] font-bold rounded-lg transition-colors {timeRange ===
           '7D'
-            ? 'bg-white text-primary shadow-sm'
-            : 'text-slate-400'}"
+            ? 'bg-surface text-primary shadow-sm'
+            : 'text-text-muted'}"
           onclick={() => (timeRange = "7D")}
         >
           Day
@@ -230,8 +230,8 @@
         <button
           class="px-3 py-1 text-[10px] font-bold rounded-lg transition-colors {timeRange ===
           '1M'
-            ? 'bg-white text-primary shadow-sm'
-            : 'text-slate-400'}"
+            ? 'bg-surface text-primary shadow-sm'
+            : 'text-text-muted'}"
           onclick={() => (timeRange = "1M")}
         >
           Month
@@ -244,9 +244,15 @@
       <div
         class="absolute inset-0 flex flex-col justify-between text-xs text-slate-300"
       >
-        <div class="border-b border-dashed border-slate-100 w-full h-0"></div>
-        <div class="border-b border-dashed border-slate-100 w-full h-0"></div>
-        <div class="border-b border-dashed border-slate-100 w-full h-0"></div>
+        <div
+          class="border-b border-dashed border-border-peach w-full h-0"
+        ></div>
+        <div
+          class="border-b border-dashed border-border-peach w-full h-0"
+        ></div>
+        <div
+          class="border-b border-dashed border-border-peach w-full h-0"
+        ></div>
       </div>
 
       <svg
@@ -278,7 +284,7 @@
     </div>
 
     <div
-      class="flex justify-between text-[10px] text-slate-400 font-bold mt-4 uppercase"
+      class="flex justify-between text-[10px] text-text-muted font-bold mt-4 uppercase"
     >
       <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span
         >Fri</span
@@ -289,7 +295,7 @@
   <!-- Active Offers List -->
   <div class="flex flex-col gap-4">
     <div class="flex items-center justify-between px-1">
-      <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+      <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
         <div class="w-2 h-2 rounded-full bg-success animate-pulse"></div>
         Live Offers
       </h2>
@@ -303,11 +309,11 @@
           delay: 300 + i * 100,
           easing: cubicOut,
         }}
-        class="bg-white p-4 rounded-[28px] border border-slate-100 shadow-sm relative overflow-hidden group flex gap-4 transition-all hover:border-primary/30 hover:shadow-md hover:-translate-y-1 duration-300"
+        class="bg-surface p-4 rounded-[28px] border border-border-peach shadow-sm relative overflow-hidden group flex gap-4 transition-all hover:border-primary/30 hover:shadow-md hover:-translate-y-1 duration-300"
       >
         <!-- Offer Image -->
         <div
-          class="w-24 h-24 bg-slate-100 rounded-2xl shrink-0 overflow-hidden relative"
+          class="w-24 h-24 bg-highlight rounded-2xl shrink-0 overflow-hidden relative"
         >
           {#if offer.image}
             <img
@@ -317,7 +323,7 @@
             />
           {:else}
             <div
-              class="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300"
+              class="w-full h-full flex items-center justify-center bg-highlight text-text-muted"
             >
               <UtensilsCrossed size={24} />
             </div>
@@ -333,7 +339,7 @@
         <div class="flex-1 flex flex-col justify-between py-1">
           <div class="flex justify-between items-start">
             <h3
-              class="font-bold text-slate-800 text-base line-clamp-2 leading-tight"
+              class="font-bold text-text-primary text-base line-clamp-2 leading-tight"
             >
               {offer.item}
             </h3>
@@ -346,9 +352,9 @@
           </div>
 
           <div
-            class="flex items-center gap-4 border-t border-slate-50 pt-2 mt-1"
+            class="flex items-center gap-4 border-t border-border-peach pt-2 mt-1"
           >
-            <div class="flex items-center gap-1.5 text-slate-500">
+            <div class="flex items-center gap-1.5 text-text-secondary">
               <Eye size={14} />
               <span class="text-xs font-bold">{offer.views}</span>
             </div>
@@ -368,23 +374,23 @@
     in:fly={{ y: 20, duration: 600, delay: 500, easing: cubicOut }}
   >
     <div class="flex items-center justify-between px-1">
-      <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-        <History size={18} class="text-slate-400" />
+      <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
+        <History size={18} class="text-text-muted" />
         Past Offers
       </h2>
       <button class="text-xs font-bold text-primary">View All</button>
     </div>
 
     <div
-      class="bg-white rounded-[28px] border border-slate-100 overflow-hidden"
+      class="bg-surface rounded-[28px] border border-border-peach overflow-hidden"
     >
       {#each pastOffers as offer, i}
         <div
-          class="p-4 border-b border-slate-50 last:border-0 flex items-center justify-between gap-3 hover:bg-slate-50/50 transition-colors"
+          class="p-4 border-b border-border-peach last:border-0 flex items-center justify-between gap-3 hover:bg-highlight/50 transition-colors"
         >
           <div class="flex items-center gap-4 flex-1 overflow-hidden">
             <div
-              class="w-12 h-12 bg-slate-100 rounded-xl overflow-hidden shrink-0"
+              class="w-12 h-12 bg-highlight rounded-xl overflow-hidden shrink-0"
             >
               {#if offer.image}
                 <img
@@ -394,29 +400,31 @@
                 />
               {:else}
                 <div class="w-full h-full flex items-center justify-center">
-                  <UtensilsCrossed size={16} class="text-slate-300" />
+                  <UtensilsCrossed size={16} class="text-text-muted" />
                 </div>
               {/if}
             </div>
             <div class="flex flex-col overflow-hidden">
-              <span class="font-bold text-slate-800 text-sm line-clamp-1"
+              <span class="font-bold text-text-primary text-sm line-clamp-1"
                 >{offer.item}</span
               >
-              <span class="text-[10px] font-bold text-slate-400"
+              <span class="text-[10px] font-bold text-text-muted"
                 >{offer.date}</span
               >
             </div>
           </div>
           <div class="flex items-center gap-4 shrink-0">
             <div class="text-right">
-              <div class="text-xs font-bold text-slate-600">{offer.views}</div>
-              <div class="text-[9px] font-bold text-slate-400 uppercase">
+              <div class="text-xs font-bold text-text-secondary">
+                {offer.views}
+              </div>
+              <div class="text-[9px] font-bold text-text-muted uppercase">
                 Views
               </div>
             </div>
             <div class="text-right">
               <div class="text-xs font-bold text-primary">{offer.likes}</div>
-              <div class="text-[9px] font-bold text-slate-400 uppercase">
+              <div class="text-[9px] font-bold text-text-muted uppercase">
                 Likes
               </div>
             </div>

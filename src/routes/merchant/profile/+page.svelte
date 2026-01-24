@@ -12,6 +12,7 @@
     Clock,
     Palette,
     Moon,
+    Sun,
     HelpCircle,
     MessageCircle,
     MessageSquare,
@@ -23,6 +24,7 @@
   import { goto } from "$app/navigation";
   import { fly, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
+  import { theme } from "$lib/stores/theme";
 
   let businessName = $state("Paradise Biryani");
 
@@ -53,15 +55,19 @@
       merchantDpPreview = URL.createObjectURL(merchantDp);
     }
   }
+
+  function toggleTheme() {
+    $theme = $theme === "dark" ? "light" : "dark";
+  }
 </script>
 
 <div
-  class="min-h-screen bg-[#FFF5E1] pb-24"
+  class="min-h-screen bg-bg-app pb-24 transition-colors duration-300"
   in:fade={{ duration: 300, easing: cubicOut }}
 >
   <!-- Header with DP Upload -->
   <header
-    class="relative px-6 pt-12 pb-8 flex flex-col items-center gap-4 text-center bg-white rounded-b-[40px] shadow-sm z-10"
+    class="relative px-6 pt-12 pb-8 flex flex-col items-center gap-4 text-center bg-surface rounded-b-[40px] shadow-sm z-10 transition-colors duration-300"
   >
     <div
       class="absolute top-4 right-4 text-xs font-bold text-success bg-success/10 px-3 py-1.5 rounded-full flex items-center gap-1"
@@ -72,7 +78,7 @@
 
     <button
       onclick={() => dpInput.click()}
-      class="relative group w-28 h-28 bg-slate-50 rounded-[36px] border-4 border-white shadow-xl flex items-center justify-center text-primary overflow-hidden cursor-pointer hover:border-primary/30 transition-all active:scale-95"
+      class="relative group w-28 h-28 bg-slate-50 rounded-[36px] border-4 border-surface shadow-xl flex items-center justify-center text-primary overflow-hidden cursor-pointer hover:border-primary/30 transition-all active:scale-95"
     >
       {#if merchantDpPreview}
         <img
@@ -134,7 +140,7 @@
       </div>
 
       <div
-        class="bg-white p-5 rounded-[28px] border border-border-peach shadow-sm hover:shadow-md transition-shadow"
+        class="bg-surface p-5 rounded-[28px] border border-border-peach shadow-sm hover:shadow-md transition-all duration-300"
       >
         {#if isEditingLocation}
           <div class="flex flex-col gap-3" in:fly={{ y: 10, duration: 300 }}>
@@ -216,7 +222,7 @@
       </div>
 
       <div
-        class="bg-white p-5 rounded-[28px] border border-border-peach shadow-sm hover:shadow-md transition-shadow"
+        class="bg-surface p-5 rounded-[28px] border border-border-peach shadow-sm hover:shadow-md transition-all duration-300"
       >
         {#if isEditingTiming}
           <div class="grid grid-cols-2 gap-4" in:fly={{ y: 10, duration: 300 }}>
@@ -287,18 +293,23 @@
         </h2>
       </div>
       <button
-        class="w-full bg-white p-5 rounded-[28px] border border-border-peach shadow-sm flex items-center justify-between hover:border-primary/50 transition-colors group active:scale-[0.98] duration-200 scroll-smooth"
+        onclick={toggleTheme}
+        class="w-full bg-surface p-5 rounded-[28px] border border-border-peach shadow-sm flex items-center justify-between hover:border-primary/50 transition-all duration-300 group active:scale-[0.98] scroll-smooth"
       >
         <div class="flex items-center gap-4">
           <div
             class="p-3 bg-slate-100 text-slate-600 rounded-2xl group-hover:bg-primary/10 group-hover:text-primary transition-colors"
           >
-            <Moon size={20} />
+            {#if $theme === "dark"}
+              <Moon size={20} />
+            {:else}
+              <Sun size={20} />
+            {/if}
           </div>
           <div class="font-bold text-text-primary">Theme</div>
         </div>
         <div class="flex items-center gap-2 text-text-muted font-bold text-sm">
-          Dark
+          {$theme === "dark" ? "Dark" : "Light"}
           <ChevronRight size={16} />
         </div>
       </button>
@@ -318,7 +329,7 @@
         </h2>
       </div>
       <div
-        class="bg-white rounded-[28px] border border-border-peach shadow-sm overflow-hidden flex flex-col"
+        class="bg-surface rounded-[28px] border border-border-peach shadow-sm overflow-hidden flex flex-col transition-colors duration-300"
       >
         <button
           onclick={() => goto("/merchant/faq")}
@@ -375,7 +386,7 @@
         </h2>
       </div>
       <div
-        class="bg-white rounded-[28px] border border-border-peach shadow-sm overflow-hidden flex flex-col"
+        class="bg-surface rounded-[28px] border border-border-peach shadow-sm overflow-hidden flex flex-col transition-colors duration-300"
       >
         <button
           onclick={() => goto("/legal/privacy")}
