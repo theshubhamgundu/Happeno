@@ -4,7 +4,7 @@
   import { MapPin } from 'lucide-svelte';
 
   interface Props {
-    center?: [number, number];
+    center?: [number, number]; // [lng, lat]
     zoom?: number;
     markers?: Array<{
       lng: number;
@@ -19,33 +19,42 @@
   let mapContainer: HTMLElement;
   let map: any;
 
-  onMount(() => {
-    // Check if mappls is loaded from app.html
-    // @ts-ignore
-    if (typeof mappls !== 'undefined') {
-      // @ts-ignore
-      map = new mappls.Map(mapContainer, {
-        center: [center[1], center[0]], // mappls usually takes [lat, lng] or has specific order, often [lat, lng]
-        zoom: 15,
-      });
+  // Ola Maps SDK global
+  declare const OlaMaps: any;
 
-      // Add markers if map is ready
-      map.on('load', () => {
-        markers.forEach(m => {
-          // @ts-ignore
-          new mappls.Marker({
-            map: map,
-            position: { lat: m.lat, lng: m.lng },
-            title: m.title
+  onMount(() => {
+    // Check if OlaMaps is loaded from app.html
+    if (typeof OlaMaps !== 'undefined') {
+      try {
+        const olaMaps = new OlaMaps({
+          apiKey: 'kHU0HCI2mlwBKox2kRwcTgpjsfEz0LEXKDPKcGhx'
+        });
+
+        map = olaMaps.init({
+          style: "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
+          container: mapContainer,
+          center: center, // [lng, lat]
+          zoom: 15
+        });
+
+        map.on('load', () => {
+          markers.forEach(m => {
+            if (typeof OlaMaps.Marker === 'function') {
+              new OlaMaps.Marker()
+                .setLngLat([m.lng, m.lat])
+                .addTo(map);
+            }
           });
         });
-      });
+      } catch (e) {
+        console.error("Ola Maps Component Init Error:", e);
+      }
     }
   });
 </script>
 
 <div bind:this={mapContainer} class={cn("w-full h-full rounded-[40px] overflow-hidden relative bg-[#f5f5f5]", className)}>
-  {#if typeof mappls === 'undefined'}
+  {#if typeof OlaMaps === 'undefined'}
     <div class="absolute inset-0 flex items-center justify-center">
     <div class="absolute inset-0 bg-[#e5e5e5] flex items-center justify-center overflow-hidden">
       <!-- Grid Pattern for Map Mock -->
@@ -83,8 +92,25 @@
 
     <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full border border-border-peach text-[10px] font-bold tracking-widest uppercase text-text-muted flex items-center gap-2">
       <div class="w-2 h-2 rounded-full bg-success"></div>
-      Mappls Interface
+      Ola Maps Interface
     </div>
   </div>
   {/if}
 </div>
+
+<style>
+  :global(.maplibregl-ctrl),
+  :global(.maplibregl-ctrl-logo),
+  :global(.maplibregl-ctrl-attrib),
+  :global(.mapboxgl-ctrl-logo),
+  :global(.mapboxgl-ctrl-attrib),
+  :global(.olamaps-logo) { 
+    display: none !important; 
+    visibility: hidden !important;
+  }
+  
+  :global(.maplibregl-ctrl-bottom-left),
+  :global(.maplibregl-ctrl-bottom-right) {
+    display: none !important;
+  }
+</style>
