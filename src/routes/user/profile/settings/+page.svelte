@@ -7,7 +7,7 @@
   let darkMode = $state(false);
   let biometric = $state(true);
 
-  const settingSections = [
+  let settingSections = $derived([
     {
       title: 'Preferences',
       items: [
@@ -30,13 +30,13 @@
         { id: 'delete', name: 'Delete Account', icon: Trash2, type: 'danger' },
       ]
     }
-  ];
+  ]);
 </script>
 
 <div class="min-h-screen bg-bg-app pb-32 text-text-primary">
   <!-- Header -->
   <header class="px-6 pt-12 pb-6 sticky top-0 bg-bg-app/95 backdrop-blur-xl z-20 flex items-center gap-4 border-b border-border-dark/50">
-    <button onclick={() => history.back()} class="p-2 -ml-2">
+    <button onclick={() => history.back()} class="p-2 -ml-2" aria-label="Go back">
       <ChevronLeft size={24} />
     </button>
     <h1 class="text-xl font-black">Settings</h1>
@@ -65,6 +65,7 @@
               {#if item.type === 'toggle'}
                 <button 
                   onclick={() => item.setter && item.setter(!item.value)}
+                  aria-label={`Toggle ${item.name}`}
                   class={cn(
                     "w-12 h-6 rounded-full transition-colors relative",
                     item.value ? "bg-primary" : "bg-border-dark"
