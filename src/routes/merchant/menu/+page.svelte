@@ -29,7 +29,7 @@
     let newItemDesc = $state("");
     let newItemImage: File | null = $state(null);
     let newItemPreview: string | null = $state(null);
-    let fileInput: HTMLInputElement;
+    let fileInput: HTMLInputElement | undefined = $state();
 
     function handleImageSelect(e: Event) {
         const target = e.target as HTMLInputElement;
@@ -170,7 +170,7 @@
 
                 <div class="flex gap-4">
                     <button
-                        onclick={() => fileInput.click()}
+                        onclick={() => fileInput?.click()}
                         class="w-24 h-24 rounded-2xl bg-highlight border-2 border-dashed border-border-peach flex items-center justify-center shrink-0 overflow-hidden hover:border-primary/50 transition-colors active:scale-95"
                     >
                         {#if newItemPreview}
@@ -421,3 +421,14 @@
         </div>
     </main>
 </div>
+
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>

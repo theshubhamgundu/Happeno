@@ -17,14 +17,14 @@
   import { cn } from '$lib/utils';
 
   const menuItems = [
-    { name: 'Saved Offers', icon: ClipboardList, path: '/user/saved-offers' },
-    { name: 'Favorite Restaurants', icon: Heart, path: '/user/favorites' },
-    { name: 'Saved Addresses', icon: MapPin, path: '/user/addresses' },
+    { name: 'Saved Offers', icon: ClipboardList, path: '/user/saved-offers', colorClass: 'bg-primary/10 text-primary' },
+    { name: 'Favorite Restaurants', icon: Heart, path: '/user/favorites', colorClass: 'bg-primary/10 text-primary' },
+    { name: 'Saved Addresses', icon: MapPin, path: '/user/addresses', colorClass: 'bg-urgency/10 text-urgency' },
   ];
 
   const supportItems = [
-    { name: 'Help & Support', icon: HelpCircle, path: '/user/support' },
-    { name: 'Settings', icon: Settings, path: '/user/profile/settings' },
+    { name: 'Help & Support', icon: HelpCircle, path: '/user/support', colorClass: 'bg-urgency/10 text-urgency' },
+    { name: 'Settings', icon: Settings, path: '/user/profile/settings', colorClass: 'bg-urgency/10 text-urgency' },
   ];
 
   function handleLogout() {
@@ -68,8 +68,8 @@
           )}
         >
           <div class="flex items-center gap-4">
-            <div class="p-2.5 bg-bg-app rounded-xl text-primary">
-              <item.icon size={20} strokeWidth={1.5} />
+            <div class={cn("p-3 rounded-2xl", item.colorClass)}>
+              <item.icon size={22} strokeWidth={1.5} />
             </div>
             <span class="text-sm font-bold">{item.name}</span>
           </div>
@@ -89,8 +89,8 @@
           )}
         >
           <div class="flex items-center gap-4">
-            <div class="p-2.5 bg-bg-app rounded-xl text-text-muted">
-              <item.icon size={20} strokeWidth={1.5} />
+            <div class={cn("p-3 rounded-2xl", item.colorClass)}>
+              <item.icon size={22} strokeWidth={1.5} />
             </div>
             <span class="text-sm font-bold">{item.name}</span>
           </div>
@@ -110,7 +110,7 @@
 
     <!-- App Version -->
     <p class="text-center text-xs text-text-muted font-medium pb-4">
-      Happeno v1.0.0 • Made with ❤️ in Hyderabad
+      Happeno v1.0.0
     </p>
   </main>
 </div>

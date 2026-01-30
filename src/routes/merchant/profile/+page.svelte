@@ -50,7 +50,7 @@
   let merchantDpPreview: string | null = $state(
     "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&q=80",
   );
-  let dpInput: HTMLInputElement;
+  let dpInput: HTMLInputElement | undefined = $state();
 
   function handleDpSelect(e: Event) {
     const target = e.target as HTMLInputElement;
@@ -462,10 +462,12 @@
           <div class="grid grid-cols-2 gap-4" in:fly={{ y: 10, duration: 300 }}>
             <div class="space-y-2">
               <label
+                for="open-at"
                 class="text-xs font-bold text-slate-500 uppercase tracking-wide ml-1"
                 >Opens At</label
               >
               <input
+                id="open-at"
                 type="time"
                 bind:value={openTime}
                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-primary font-bold text-slate-800"
@@ -473,10 +475,12 @@
             </div>
             <div class="space-y-2">
               <label
+                for="closes-at"
                 class="text-xs font-bold text-slate-500 uppercase tracking-wide ml-1"
                 >Closes At</label
               >
               <input
+                id="closes-at"
                 type="time"
                 bind:value={closeTime}
                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-primary font-bold text-slate-800"

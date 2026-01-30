@@ -68,7 +68,8 @@
         </button>
       {/if}
     </div>
-  </header>
+  </div>
+</header>
 
   <main class="px-6 space-y-10 pt-4">
     <!-- Recent Searches -->

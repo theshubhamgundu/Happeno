@@ -84,6 +84,10 @@ export interface MerchantProfile {
     phone: string;
     email: string;
     approvalStatus: 'new' | 'pending' | 'approved' | 'rejected';
+    location: {
+        lat: number;
+        lng: number;
+    };
 }
 
 const initialProfile: MerchantProfile = {
@@ -98,7 +102,11 @@ const initialProfile: MerchantProfile = {
     type: "both",
     phone: "9876543210",
     email: "contact@paradise.com",
-    approvalStatus: "approved"
+    approvalStatus: "approved",
+    location: {
+        lat: 17.4460,
+        lng: 78.3880
+    }
 };
 
 export const menuItemsStore = writable<MenuItem[]>(initialMenuItems);

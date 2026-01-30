@@ -1,217 +1,413 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { goto } from '$app/navigation';
-  import { MapPin, Navigation, ChevronLeft, Search, Crosshair } from 'lucide-svelte';
-  import { browser } from '$app/environment';
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+  import {
+    MapPin,
+    Navigation,
+    ChevronLeft,
+    Search,
+    Crosshair,
+    X,
+    AlertCircle,
+  } from "lucide-svelte";
+  import { browser } from "$app/environment";
+  import { cn } from "$lib/utils";
+  import { PUBLIC_OLA_MAPS_API_KEY as OLA_API_KEY } from "$env/static/public";
 
   let mapElement: HTMLElement;
   let map: any;
-  let L: any;
-  let address = $state('Fetching location...');
-  let subAddress = $state('Pace the pin on your exact location');
+  let address = $state("Fetching location...");
+  let subAddress = $state("Place the pin on your exact location");
   let isDragging = $state(false);
-  let searchQuery = $state('');
+  let searchQuery = $state("");
+  let suggestions = $state<any[]>([]);
+  let showSuggestions = $state(false);
+  let isSearching = $state(false);
+  let debounceTimer: any;
+  let usingFallback = $state(false);
+  let isLoadingLocation = $state(true);
 
-  async function handleSearch() {
-    if (!searchQuery) return;
-    
+  // Ola Maps SDK global
+  declare const OlaMaps: any;
+
+  // --- Function Definitions (Hoisted) ---
+
+  function triggerFallback() {
+    if (usingFallback) return;
+    usingFallback = true;
+    isLoadingLocation = false;
+    if (map && typeof map.remove === "function") {
+      try {
+        map.remove();
+      } catch (e) {}
+    }
+    initLeaflet();
+  }
+
+  async function handleCurrentLocation(silent = false) {
+    if (!map) return;
+    if (!silent) isLoadingLocation = true;
+    const minWait = silent
+      ? Promise.resolve()
+      : new Promise((r) => setTimeout(r, 1500));
+
+    navigator.geolocation.getCurrentPosition(
+      async (p) => {
+        const { latitude, longitude } = p.coords;
+        await minWait;
+        if (usingFallback) map.setView([latitude, longitude], 18);
+        else map.setCenter([longitude, latitude]);
+        isLoadingLocation = false;
+      },
+      () => {
+        isLoadingLocation = false;
+      },
+      { timeout: 6000 },
+    );
+  }
+
+  async function initLeaflet() {
+    const L = (await import("leaflet")).default;
+    await import("leaflet/dist/leaflet.css");
+    map = L.map(mapElement, {
+      zoomControl: false,
+      attributionControl: false,
+    }).setView([17.385, 78.4867], 15);
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    ).addTo(map);
+
+    map.on("movestart", () => {
+      isDragging = true;
+      address = "Locating...";
+    });
+    map.on("moveend", async () => {
+      isDragging = false;
+      const center = map.getCenter();
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${center.lat}&lon=${center.lng}&addressdetails=1`,
+        );
+        const data = await res.json();
+        address = data.display_name.split(",")[0];
+        subAddress = data.display_name.split(",").slice(1, 4).join(", ");
+      } catch (e) {}
+    });
+    handleCurrentLocation(true);
+  }
+
+  function initOlaMaps() {
+    if (!mapElement) return;
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
-      const data = await response.json();
-      
-      if (data && data.length > 0) {
-        const { lat, lon } = data[0];
-        map.flyTo([lat, lon], 16);
-      } else {
-        alert('Location not found');
-      }
-    } catch (e) {
-      alert('Error searching location');
-    }
-  }
-
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  }
-
-  onMount(async () => {
-    if (browser) {
-      const leaflet = await import('leaflet');
-      L = leaflet.default;
-      await import('leaflet/dist/leaflet.css');
-
-      map = L.map(mapElement, {
-        zoomControl: false,
-        attributionControl: false
-      }).setView([17.3850, 78.4867], 15);
-
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        maxZoom: 20
-      }).addTo(map);
-
-      map.on('movestart', () => {
-        isDragging = true;
-        address = 'Locating...';
-        subAddress = 'Pace the pin on your exact location';
+      const olaMaps = new OlaMaps({ apiKey: OLA_API_KEY });
+      map = olaMaps.init({
+        style:
+          "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
+        container: mapElement,
+        center: [78.4867, 17.385],
+        zoom: 15,
       });
 
+      map.on("load", () => {
+        console.log("Ola Map loaded successfully");
+        isLoadingLocation = false;
+        handleCurrentLocation(false);
+      });
 
-      map.on('moveend', async () => {
+      map.on("error", (e: any) => {
+        console.warn("Ola Map SDK Warning:", e);
+        // We allow the user to see the UI even if tiles fail,
+        // fallback is now handled more cautiously.
+      });
+
+      map.on("movestart", () => {
+        isDragging = true;
+        address = "Locating...";
+      });
+
+      map.on("moveend", async () => {
         isDragging = false;
         const center = map.getCenter();
-        
-        await new Promise(r => setTimeout(r, 600)); // Debounce
-        
         try {
-          // Nominatim is best for OpenStreetMap data in India
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${center.lat}&lon=${center.lng}&zoom=18&addressdetails=1`
+          const res = await fetch(
+            `https://api.olamaps.io/places/v1/reverse-geocode?latlng=${center.lat},${center.lng}&api_key=${OLA_API_KEY}`,
           );
-          
-          if (!response.ok) throw new Error('Network error');
-
-          const data = await response.json();
-          
-          if (data && data.address) {
-            const addr = data.address;
-            
-            // Prioritize specific local area names for Indian cities
-            const mainName = addr.amenity || 
-                            addr.building || 
-                            addr.residential || 
-                            addr.neighbourhood || 
-                            addr.suburb || 
-                            addr.village ||
-                            addr.road ||
-                            'Unknown Location';
-
-            // Construct specific address line
-            const sub = [
-               addr.road,
-               addr.suburb,
-               addr.city_district,
-               addr.city,
-               addr.postcode
-            ].filter((val, index, self) => 
-               Boolean(val) && val !== mainName && self.indexOf(val) === index
-            ).slice(0, 3).join(', ');
-
-            address = mainName;
-            subAddress = sub || data.display_name.split(',').slice(0, 2).join(', ');
+          const data = await res.json();
+          if (data.results?.[0]) {
+            address =
+              data.results[0].name ||
+              data.results[0].formatted_address.split(",")[0];
+            subAddress = data.results[0].formatted_address
+              .split(",")
+              .slice(1)
+              .join(", ")
+              .trim();
           }
         } catch (e) {
-          address = 'Location Selected';
-          subAddress = `${center.lat.toFixed(5)}, ${center.lng.toFixed(5)}`;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${center.lat}&lon=${center.lng}`,
+          );
+          const data = await res.json();
+          address = data.display_name.split(",")[0];
         }
       });
-    }
-  });
-
-  function handleCurrentLocation() {
-    if (!map) return;
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(position => {
-        const { latitude, longitude } = position.coords;
-        // Check if coordinates valid?
-        map.flyTo([latitude, longitude], 18);
-      }, (error) => {
-        console.error("Geo error", error);
-        alert("Could not get your location. Please enable location services.");
-      });
-    } else {
-      alert('Geolocation is not supported by your browser');
+    } catch (err) {
+      console.error("Ola Maps Sync Error:", err);
+      triggerFallback();
     }
   }
 
   function confirmLocation() {
+    localStorage.setItem(
+      "userLocation",
+      JSON.stringify({ name: address, address: subAddress }),
+    );
+    goto("/user/nearby");
+  }
+
+  // --- Component Lifecycle ---
+
+  onMount(() => {
     if (browser) {
-      localStorage.setItem('userLocation', JSON.stringify({
-        name: address,
-        address: subAddress
-      }));
-      goto('/user/nearby');
+      console.log("Onboarding: Looking for Ola Maps SDK...");
+      let attempts = 0;
+      const checkOla = setInterval(() => {
+        attempts++;
+        if (typeof OlaMaps !== "undefined") {
+          clearInterval(checkOla);
+          console.log("Ola Maps SDK found. Initializing...");
+          initOlaMaps();
+        }
+        if (attempts > 60) {
+          clearInterval(checkOla);
+          if (!map && !usingFallback) triggerFallback();
+        }
+      }, 100);
+      return () => clearInterval(checkOla);
     }
+  });
+
+  $effect(() => {
+    if (searchQuery.length < 3) {
+      suggestions = [];
+      showSuggestions = false;
+      return;
+    }
+    isSearching = true;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(async () => {
+      try {
+        if (!usingFallback) {
+          const res = await fetch(
+            `https://api.olamaps.io/places/v1/autocomplete?input=${encodeURIComponent(searchQuery)}&api_key=${OLA_API_KEY}`,
+          );
+          const data = await res.json();
+          if (data.predictions) {
+            suggestions = data.predictions.map((p: any) => ({
+              placeName: p.structured_formatting.main_text,
+              placeAddress: p.structured_formatting.secondary_text,
+              placeId: p.place_id,
+            }));
+            showSuggestions = true;
+          }
+        } else {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=10&countrycodes=in`,
+          );
+          const data = await res.json();
+          suggestions = data.map((item: any) => ({
+            placeName: item.display_name.split(",")[0],
+            placeAddress: item.display_name
+              .split(",")
+              .slice(1)
+              .join(", ")
+              .trim(),
+            latitude: item.lat,
+            longitude: item.lon,
+          }));
+          showSuggestions = true;
+        }
+      } finally {
+        isSearching = false;
+      }
+    }, 450);
+  });
+
+  async function selectSuggestion(suggestion: any) {
+    searchQuery = suggestion.placeName;
+    if (!usingFallback && suggestion.placeId) {
+      try {
+        const res = await fetch(
+          `https://api.olamaps.io/places/v1/details?place_id=${suggestion.placeId}&api_key=${OLA_API_KEY}`,
+        );
+        const data = await res.json();
+        if (data.result?.geometry?.location) {
+          const { lat, lng } = data.result.geometry.location;
+          map.setCenter([lng, lat]);
+          map.setZoom(17);
+        }
+      } catch (e) {}
+    } else {
+      const lat = parseFloat(suggestion.latitude);
+      const lng = parseFloat(suggestion.longitude);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        if (usingFallback) map.setView([lat, lng], 17);
+        else map.setCenter([lng, lat]);
+      }
+    }
+    showSuggestions = false;
   }
 </script>
 
 <div class="h-screen flex flex-col bg-bg-app relative overflow-hidden">
-  <!-- Top Navigation (Floating) -->
-  <div class="absolute top-0 left-0 right-0 z-[1000] p-4 pt-12 bg-gradient-to-b from-black/50 to-transparent pointer-events-none">
-    <div class="flex items-center gap-3 pointer-events-auto">
-      <button 
+  {#if isLoadingLocation}
+    <div
+      class="absolute inset-0 z-[5001] bg-bg-app flex flex-col items-center justify-center"
+    >
+      <div
+        class="relative w-full flex items-center justify-center max-w-[450px]"
+      >
+        <video
+          src="/happeno.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+          class="w-full h-full object-contain"
+        ></video>
+      </div>
+      <div
+        class="absolute bottom-24 flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom duration-1000"
+      >
+        <div
+          class="w-10 h-10 border-[3px] border-primary/20 border-t-primary rounded-full animate-spin"
+        ></div>
+        <p class="text-primary font-black text-sm tracking-[0.2em] uppercase">
+          Locating You...
+        </p>
+      </div>
+    </div>
+  {/if}
+
+  <div
+    class="absolute left-0 right-0 z-[1000] p-4 pointer-events-none transition-all duration-300 top-12"
+  >
+    <div
+      class="flex items-center gap-3 pointer-events-auto max-w-lg mx-auto w-full"
+    >
+      <button
         onclick={() => history.back()}
-        class="w-10 h-10 bg-surface rounded-full flex items-center justify-center shadow-lg text-text-primary"
+        class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg text-black active:scale-95 transition-transform"
       >
         <ChevronLeft size={24} />
       </button>
-      
-      <div class="flex-1 bg-surface rounded-xl shadow-lg flex items-center px-4 py-2.5 gap-3">
-        <Search size={18} class="text-text-muted" />
-        <input 
-          bind:value={searchQuery}
-          onkeydown={handleKeydown}
-          placeholder="Search for area, street name..."
-          class="flex-1 bg-transparent text-sm font-bold text-text-primary outline-none placeholder:text-text-muted font-sans"
-        />
+      <div class="flex-1 relative flex flex-col gap-2">
+        <div
+          class="bg-white rounded-2xl shadow-xl flex items-center px-4 py-3 gap-3 border border-gray-100"
+        >
+          <Search
+            size={20}
+            class={cn(
+              "transition-colors",
+              isSearching ? "text-primary animate-pulse" : "text-gray-400",
+            )}
+          />
+          <input
+            bind:value={searchQuery}
+            placeholder="Search for your location..."
+            class="flex-1 bg-transparent text-sm font-bold text-black outline-none placeholder:text-gray-400"
+            autocomplete="off"
+          />
+          {#if searchQuery}
+            <button
+              onclick={() => {
+                searchQuery = "";
+                suggestions = [];
+                showSuggestions = false;
+              }}
+              class="text-gray-400 hover:text-black"><X size={18} /></button
+            >
+          {/if}
+        </div>
+        {#if showSuggestions}
+          <div
+            class="bg-white rounded-2xl shadow-2xl border border-gray-100 mt-1 absolute top-full left-0 right-0 z-[1100] max-h-[65vh] overflow-y-auto no-scrollbar animate-in fade-in zoom-in duration-200"
+          >
+            {#each suggestions as s}
+              <button
+                onclick={() => selectSuggestion(s)}
+                class="w-full px-5 py-4 flex items-start gap-4 hover:bg-gray-50 text-left border-b border-dashed border-gray-200 last:border-0"
+              >
+                <MapPin size={18} class="text-gray-400 mt-0.5" />
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm font-bold text-black truncate">
+                    {s.placeName}
+                  </div>
+                  <div
+                    class="text-[11px] text-gray-500 font-medium line-clamp-2 leading-relaxed"
+                  >
+                    {s.placeAddress}
+                  </div>
+                </div>
+              </button>
+            {/each}
+          </div>
+        {/if}
       </div>
     </div>
   </div>
 
-  <!-- Map Container -->
   <div class="flex-1 relative bg-gray-100" bind:this={mapElement}>
-    <!-- Center Pin (Static Overlay) -->
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[900] -mt-8 pointer-events-none flex flex-col items-center">
-      <div class="relative drop-shadow-xl">
-        <img 
-          src="/logo.png" 
-          alt="Location" 
-          class="w-16 h-16 object-contain -mb-1"
-        />
-        <div class="hidden w-4 h-4 bg-black/20 rounded-full blur-[2px] absolute bottom-1 left-1/2 -translate-x-1/2"></div>
-      </div>
-      {#if isDragging}
-        <div class="bg-black/70 text-white text-[10px] font-bold px-3 py-1 rounded-full mt-2 backdrop-blur-sm">
-          Place Pin
-        </div>
-      {/if}
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[900] -mt-8 pointer-events-none flex flex-col items-center"
+    >
+      <img
+        src="/logo.png"
+        alt="Pin"
+        class={cn(
+          "w-14 h-14 object-contain transition-transform duration-300",
+          isDragging && "scale-110 -translate-y-2",
+        )}
+      />
     </div>
-
-    <!-- Current Location Button -->
-    <button 
-      onclick={handleCurrentLocation}
-      class="absolute bottom-6 right-6 z-[900] w-12 h-12 bg-surface rounded-full shadow-xl flex items-center justify-center text-primary border border-primary/10 active:scale-95 transition-transform"
+    <button
+      onclick={() => handleCurrentLocation(true)}
+      class="absolute bottom-6 right-6 z-[900] w-12 h-12 bg-white rounded-full shadow-2xl flex items-center justify-center text-primary border border-gray-100 active:scale-90 transition-transform"
     >
       <Crosshair size={24} />
     </button>
   </div>
 
-  <!-- Bottom Sheet -->
-  <div class="bg-surface rounded-t-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] p-6 pb-8 z-[1000] animate-in slide-in-from-bottom duration-500">
-    <div class="w-12 h-1.5 bg-border-dark rounded-full mx-auto mb-6 opacity-50"></div>
-    
+  <div
+    class="bg-white rounded-t-[32px] shadow-[0_-10_-40px_rgba(0,0,0,0.1)] p-6 pb-8 z-[1000] animate-in slide-in-from-bottom duration-500"
+  >
+    <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6"></div>
     <div class="flex items-start gap-4 mb-6">
-      <div class="p-3 bg-primary/10 rounded-2xl text-primary mt-1">
+      <div class="p-3 bg-primary/10 rounded-2xl text-primary">
         <MapPin size={24} />
       </div>
-      <div>
-        <h2 class="text-xl font-black text-text-primary mb-1">{address}</h2>
-        <p class="text-sm text-text-muted font-medium leading-relaxed">{subAddress}</p>
+      <div class="min-w-0">
+        <h2 class="text-xl font-black text-black mb-1 truncate">{address}</h2>
+        <p class="text-xs text-gray-500 font-bold leading-relaxed line-clamp-2">
+          {subAddress}
+        </p>
       </div>
     </div>
-
-    <button 
+    <button
       onclick={confirmLocation}
-      class="w-full py-4 bg-primary text-white font-bold text-lg rounded-2xl shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-[0.98] transition-all"
+      class="w-full py-4 bg-primary text-white font-bold text-lg rounded-2xl shadow-lg shadow-primary/25 hover:brightness-110 active:scale-[0.98] transition-all"
+      >Confirm Location</button
     >
-      Confirm Location
-    </button>
   </div>
 </div>
 
 <style>
-  :global(.leaflet-control-container) {
+  :global(.leaflet-control-container),
+  :global(.maplibregl-ctrl),
+  :global(.olamaps-logo) {
+    display: none !important;
+  }
+  .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
 </style>
