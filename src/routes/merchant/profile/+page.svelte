@@ -115,13 +115,7 @@
       </div>
     {/if}
 
-    <button
-      onclick={() => goto("/merchant/dashboard")}
-      class="absolute top-4 left-4 p-2 rounded-full hover:bg-slate-100 text-text-primary transition-colors"
-      aria-label="Go back"
-    >
-      <ArrowLeft size={24} />
-    </button>
+    <!-- Back Button Removed (Handled by Global Header) -->
 
     <button
       onclick={() => dpInput.click()}

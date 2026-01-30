@@ -171,35 +171,24 @@
 </script>
 
 <div
-    class="min-h-screen bg-bg-app pb-24 transition-colors duration-300"
+    class="min-h-screen bg-bg-app pb-24 transition-colors duration-300 pt-6"
     in:fade={{ duration: 300, easing: cubicOut }}
 >
-    <!-- Header -->
-    <header
-        class="sticky top-0 z-20 bg-surface/80 backdrop-blur-md border-b border-border-peach px-6 py-4 flex items-center gap-4 shadow-sm transition-colors duration-300"
-    >
-        <button
-            onclick={() => goto("/merchant/dashboard")}
-            class="p-2 -ml-2 text-text-muted hover:text-text-primary rounded-full hover:bg-highlight transition-all active:scale-90 duration-200"
-        >
-            <ChevronLeft size={24} />
-        </button>
-        <div class="flex-1">
+    <main class="px-6 flex flex-col gap-6">
+        <!-- Page Title Block -->
+        <div class="flex items-center gap-3">
             <h1
-                class="text-xl font-bold text-text-primary flex items-center gap-2"
+                class="text-2xl font-bold text-text-primary flex items-center gap-3"
             >
-                <UtensilsCrossed size={20} class="text-primary" />
+                <UtensilsCrossed size={24} class="text-[#FF2E7E]" />
                 Menu Management
             </h1>
+            <div
+                class="w-8 h-8 rounded-full bg-[#FF2E7E]/10 flex items-center justify-center font-bold text-sm text-[#FF2E7E]"
+            >
+                {$menuItemsStore.length}
+            </div>
         </div>
-        <div
-            class="w-8 h-8 rounded-full bg-highlight flex items-center justify-center font-bold text-xs text-text-muted"
-        >
-            {$menuItemsStore.length}
-        </div>
-    </header>
-
-    <main class="px-6 py-6 flex flex-col gap-6">
         <!-- Search / Filter (Visual only) -->
         <div class="relative">
             <Search size={20} class="absolute left-4 top-3.5 text-text-muted" />

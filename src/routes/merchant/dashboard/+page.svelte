@@ -17,51 +17,17 @@
     Crown,
   } from "lucide-svelte";
   import Button from "$lib/components/Button.svelte";
+  import DistrictHeader from "$lib/components/DistrictHeader.svelte";
   import { goto } from "$app/navigation";
   import {
     activeOffersStore,
     menuItemsStore,
     profileStore,
   } from "$lib/stores/merchant";
-  import { fly, fade } from "svelte/transition";
-  import { cubicOut } from "svelte/easing";
+  import { fly, fade, slide, scale } from "svelte/transition";
+  import { cubicOut, elasticOut, backOut } from "svelte/easing";
 
   let timeRange = $state("7D"); // 24H, 7D, 1M, 1Y
-
-  // Calculate expiring offers (status is 'Expiring' or duration has 'h'/'m' and not 'D')
-  let expiringCount = $derived(
-    $activeOffersStore.filter(
-      (o) =>
-        o.status === "Expiring" ||
-        (o.expiry &&
-          (o.expiry.includes("h") || o.expiry.includes("m")) &&
-          !o.expiry.includes("D")),
-    ).length,
-  );
-
-  // Mocked Data
-  // We make stats derived so it updates when store changes
-  let stats = $derived([
-    {
-      label: "Active Offers",
-      value: $activeOffersStore.length.toString(),
-      icon: Zap,
-      color: "text-primary",
-    },
-    {
-      label: "Expiring Soon",
-      value: expiringCount.toString(),
-      subtext: "",
-      icon: Clock,
-      color: "text-urgency",
-    },
-    {
-      label: "Total Views",
-      value: "12,450",
-      icon: Eye,
-      color: "text-blue-500",
-    },
-  ]);
 
   const pastOffers = [
     {
@@ -83,181 +49,115 @@
         "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80",
     },
   ];
+
+  // Calculate expiring offers (status is 'Expiring' or duration has 'h'/'m' and not 'D')
+  let expiringCount = $derived(
+    $activeOffersStore.filter(
+      (o) =>
+        o.status === "Expiring" ||
+        (o.expiry &&
+          (o.expiry.includes("h") || o.expiry.includes("m")) &&
+          !o.expiry.includes("D")),
+    ).length,
+  );
+
+  // Calculate Total Views
+  let totalViews = $derived(
+    $activeOffersStore.reduce((acc, o) => acc + (o.views || 0), 0),
+  );
+
+  // Mocked Data
+  // We make stats derived so it updates when store changes
+  let stats = $derived([
+    {
+      label: "Active Offers",
+      value: $activeOffersStore.length.toString(),
+      icon: Zap,
+      color: "text-primary",
+      bg: "bg-surface",
+      hover: "hover:border-primary/50",
+      link: "/merchant/history?filter=active",
+      iconBg: "bg-highlight",
+    },
+    {
+      label: "Expiring Soon",
+      value: expiringCount.toString(),
+      subtext: "in 24 hours",
+      icon: Clock,
+      color: "text-urgency",
+      bg: "bg-surface",
+      hover: "hover:border-urgency/50",
+      link: "/merchant/history?filter=expiring",
+      iconBg: "bg-highlight",
+    },
+    {
+      label: "Total Views",
+      value: totalViews.toLocaleString(),
+      icon: Eye,
+      color: "text-blue-500",
+      bg: "bg-surface",
+      hover: "hover:border-blue-500/50",
+      link: "/merchant/history?filter=views",
+      iconBg: "bg-highlight",
+    },
+    {
+      label: "Your Menu",
+      value: $menuItemsStore.length.toString(),
+      icon: UtensilsCrossed,
+      color: "text-orange-500",
+      bg: "bg-surface",
+      hover: "hover:border-orange-500/50 group",
+      link: "/merchant/menu",
+      iconBg: "bg-highlight group-hover:bg-orange-50",
+    },
+  ]);
+  import { reveal } from "$lib/actions/reveal";
 </script>
 
 <div
   class="px-4 py-6 pb-32 flex flex-col gap-6 bg-bg-app min-h-screen transition-colors duration-300"
-  in:fade={{ duration: 300 }}
 >
-  <!-- Header with generic add -->
-  <header class="flex flex-col gap-4">
-    <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-text-primary flex items-center gap-2">
-        <LayoutDashboard class="text-primary" size={24} />
-        Dashboard
-      </h1>
-
-      <div class="flex items-center gap-2">
-        <a
-          href="/merchant/create-offer"
-          class="rounded-xl p-2.5 sm:px-4 sm:py-2 text-sm font-bold bg-[#FF69B4] text-white hover:bg-[#FF1493] hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md flex items-center gap-2 active:scale-95 duration-200"
-        >
-          <Plus size={20} />
-          <span class="hidden sm:inline whitespace-nowrap">Custom Offer</span>
-        </a>
-
-        <a
-          href="/merchant/history"
-          class="p-2.5 bg-surface border border-border-peach rounded-xl text-text-secondary hover:text-primary hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5 transition-all shadow-sm active:scale-95 duration-200"
-          title="History"
-        >
-          <History size={20} />
-        </a>
-        <a
-          href="/merchant/wallet"
-          class="p-2.5 bg-surface border border-border-peach rounded-xl text-text-secondary hover:text-primary hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5 transition-all shadow-sm active:scale-95 duration-200"
-          title="Wallet"
-        >
-          <Wallet size={20} />
-        </a>
-        <a
-          href="/merchant/profile"
-          class="relative p-1 rounded-full border transition-all shadow-sm overflow-hidden w-10 h-10 flex items-center justify-center bg-surface active:scale-95 duration-200 {$profileStore.isPremium
-            ? 'border-yellow-400 border-2'
-            : 'border-border-peach hover:border-primary/50'}"
-          title="Profile"
-        >
-          {#if $profileStore.isPremium}
-            <div
-              class="absolute -top-1 -right-1 z-10 bg-yellow-400 text-white rounded-full p-0.5"
-            >
-              <Crown size={8} fill="currentColor" />
+  <!-- Summary Stats Grid -->
+  <div class="grid grid-cols-2 gap-3">
+    {#each stats as stat, i}
+      <button
+        onclick={() => goto(stat.link)}
+        class="text-left {stat.bg} p-4 rounded-3xl border border-border-peach shadow-sm flex flex-col gap-3 {stat.hover} hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300 relative overflow-hidden"
+        use:reveal={{ delay: i * 100, x: 50 }}
+      >
+        <div class="flex justify-between items-start z-10">
+          <div class="p-2.5 rounded-2xl {stat.iconBg} transition-colors">
+            <stat.icon size={18} class={stat.color} />
+          </div>
+        </div>
+        <div class="z-10">
+          <div
+            class="text-text-secondary text-xs font-bold uppercase tracking-wide mb-1 truncate"
+          >
+            {stat.label}
+          </div>
+          <div class="text-2xl font-black text-text-primary truncate">
+            {stat.value}
+          </div>
+          {#if stat.subtext}
+            <div class="text-[10px] font-bold text-urgency mt-1">
+              {stat.subtext}
             </div>
           {/if}
-
-          <!-- Type Indicator (Veg/NonVeg) -->
-          <div
-            class="absolute bottom-0 right-0 z-10 p-0.5 bg-surface rounded-full shadow-sm"
-          >
-            {#if $profileStore.type === "veg"}
-              <div class="bg-green-600 rounded-full p-[2px]">
-                <div class="w-1.5 h-1.5 bg-surface rounded-full"></div>
-              </div>
-            {:else if $profileStore.type === "non-veg"}
-              <div class="bg-red-600 rounded-full p-[2px]">
-                <div class="w-1.5 h-1.5 bg-surface rounded-full"></div>
-              </div>
-            {/if}
-          </div>
-
-          {#if $profileStore.image}
-            <img
-              src={$profileStore.image}
-              alt="Profile"
-              class="w-full h-full object-cover rounded-full"
-            />
-          {:else}
-            <User size={20} class="text-text-secondary" />
-          {/if}
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <!-- Summary Stats Grid -->
-  <div
-    class="grid grid-cols-2 gap-3"
-    in:fly={{ y: 20, duration: 600, delay: 100, easing: cubicOut }}
-  >
-    <button
-      onclick={() => goto("/merchant/history?filter=active")}
-      class="text-left bg-surface p-4 rounded-3xl border border-border-peach shadow-sm flex flex-col gap-3 hover:border-primary/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
-    >
-      <div class="flex justify-between items-start">
-        <div class="p-2.5 rounded-2xl bg-highlight">
-          <Zap size={18} class="text-primary" />
         </div>
-      </div>
-      <div>
+
+        <!-- Subtle Glow Blob -->
         <div
-          class="text-text-secondary text-xs font-bold uppercase tracking-wide mb-1 truncate"
-        >
-          Active Offers
-        </div>
-        <div class="text-2xl font-black text-text-primary truncate">
-          {$activeOffersStore.length}
-        </div>
-      </div>
-    </button>
-
-    <button
-      onclick={() => goto("/merchant/history?filter=expiring")}
-      class="text-left bg-surface p-4 rounded-3xl border border-border-peach shadow-sm flex flex-col gap-3 hover:border-urgency/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
-    >
-      <div class="flex justify-between items-start">
-        <div class="p-2.5 rounded-2xl bg-highlight">
-          <Clock size={18} class="text-urgency" />
-        </div>
-      </div>
-      <div>
-        <div
-          class="text-text-secondary text-xs font-bold uppercase tracking-wide mb-1 truncate"
-        >
-          Expiring Soon
-        </div>
-        <div class="text-2xl font-black text-text-primary truncate">1</div>
-        <div class="text-[10px] font-bold text-urgency mt-1">in 24 hours</div>
-      </div>
-    </button>
-
-    <button
-      onclick={() => goto("/merchant/history?filter=views")}
-      class="text-left bg-surface p-4 rounded-3xl border border-border-peach shadow-sm flex flex-col gap-3 hover:border-blue-500/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 duration-300"
-    >
-      <div class="flex justify-between items-start">
-        <div class="p-2.5 rounded-2xl bg-highlight">
-          <Eye size={18} class="text-blue-500" />
-        </div>
-      </div>
-      <div>
-        <div
-          class="text-text-secondary text-xs font-bold uppercase tracking-wide mb-1 truncate"
-        >
-          Total Views
-        </div>
-        <div class="text-2xl font-black text-text-primary truncate">12,450</div>
-      </div>
-    </button>
-
-    <!-- NEW 4th Menu Card -->
-    <button
-      onclick={() => goto("/merchant/menu")}
-      class="text-left bg-surface p-4 rounded-3xl border border-border-peach shadow-sm flex flex-col gap-3 hover:border-orange-500/50 hover:shadow-md hover:-translate-y-1 transition-all active:scale-95 group duration-300"
-    >
-      <div class="flex justify-between items-start">
-        <div
-          class="p-2.5 rounded-2xl bg-highlight group-hover:bg-orange-50 transition-colors"
-        >
-          <UtensilsCrossed size={18} class="text-orange-500" />
-        </div>
-      </div>
-      <div>
-        <div
-          class="text-text-secondary text-xs font-bold uppercase tracking-wide mb-1 truncate"
-        >
-          Your Menu
-        </div>
-        <div class="text-2xl font-black text-text-primary truncate">
-          {$menuItemsStore.length}
-        </div>
-      </div>
-    </button>
+          class="absolute -right-4 -bottom-4 w-20 h-20 bg-highlight rounded-full blur-2xl opacity-50 group-hover:scale-150 transition-transform duration-700"
+        ></div>
+      </button>
+    {/each}
   </div>
 
   <!-- Customer Reach Graph -->
   <div
     class="bg-surface p-6 rounded-[32px] border border-border-peach shadow-sm"
-    in:fly={{ y: 20, duration: 600, delay: 200, easing: cubicOut }}
+    use:reveal={{ delay: 200, x: 50 }}
   >
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-lg font-bold text-text-primary">Customer Reach</h2>
@@ -347,12 +247,7 @@
 
     {#each $activeOffersStore as offer, i}
       <div
-        in:fly={{
-          y: 20,
-          duration: 500,
-          delay: 300 + i * 100,
-          easing: cubicOut,
-        }}
+        use:reveal={{ delay: i * 150, x: 50 }}
         class="bg-surface p-4 rounded-[28px] border border-border-peach shadow-sm relative overflow-hidden group flex gap-4 transition-all hover:border-primary/30 hover:shadow-md hover:-translate-y-1 duration-300"
       >
         <!-- Offer Image -->
@@ -435,10 +330,7 @@
   </div>
 
   <!-- Offers History -->
-  <div
-    class="flex flex-col gap-4 mt-2"
-    in:fly={{ y: 20, duration: 600, delay: 500, easing: cubicOut }}
-  >
+  <div class="flex flex-col gap-4 mt-2" use:reveal={{ delay: 300, x: 50 }}>
     <div class="flex items-center justify-between px-1">
       <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
         <History size={18} class="text-text-muted" />
