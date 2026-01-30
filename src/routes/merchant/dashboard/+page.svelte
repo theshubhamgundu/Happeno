@@ -14,9 +14,7 @@
     Wallet,
     User,
     UtensilsCrossed,
-    Hexagon,
-    MapPin,
-    ChevronRight,
+    Crown,
   } from "lucide-svelte";
   import Button from "$lib/components/Button.svelte";
   import { goto } from "$app/navigation";
@@ -124,10 +122,26 @@
           <History size={20} />
         </a>
         <a
+          href="/merchant/wallet"
+          class="p-2.5 bg-surface border border-border-peach rounded-xl text-text-secondary hover:text-primary hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5 transition-all shadow-sm active:scale-95 duration-200"
+          title="Wallet"
+        >
+          <Wallet size={20} />
+        </a>
+        <a
           href="/merchant/profile"
-          class="p-1 rounded-full border border-border-peach hover:border-primary/50 hover:shadow-md transition-all shadow-sm overflow-hidden w-10 h-10 flex items-center justify-center bg-surface active:scale-95 duration-200"
+          class="relative p-1 rounded-full border transition-all shadow-sm overflow-hidden w-10 h-10 flex items-center justify-center bg-surface active:scale-95 duration-200 {$profileStore.isPremium
+            ? 'border-yellow-400 border-2'
+            : 'border-border-peach hover:border-primary/50'}"
           title="Profile"
         >
+          {#if $profileStore.isPremium}
+            <div
+              class="absolute -top-1 -right-1 z-10 bg-yellow-400 text-white rounded-full p-0.5"
+            >
+              <Crown size={8} fill="currentColor" />
+            </div>
+          {/if}
           {#if $profileStore.image}
             <img
               src={$profileStore.image}
