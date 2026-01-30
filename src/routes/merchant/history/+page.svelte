@@ -14,6 +14,9 @@
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
   import { activeOffersStore, pastOffersStore } from "$lib/stores/merchant";
+  import { fly } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
+  import { reveal } from "$lib/actions/reveal";
 
   let filter = $derived($page.url.searchParams.get("filter") || "all");
 
@@ -42,7 +45,9 @@
           (h.status === "Active" && h.expiry.includes("m")),
       );
     if (filter === "views")
-      return [...matches].sort((a, b) => b.views - a.views);
+      return matches
+        .filter((h) => h.status === "Active")
+        .sort((a, b) => b.views - a.views);
     if (filter === "likes")
       return [...matches].sort((a, b) => b.likes - a.likes);
     return matches;
@@ -57,17 +62,12 @@
   });
 </script>
 
-<div class="min-h-screen bg-bg-app pb-24 transition-colors duration-300">
-  <header class="p-6 flex items-center gap-4">
-    <button
-      onclick={() => goto("/merchant/dashboard")}
-      class="p-2 -ml-2 text-text-muted hover:text-text-primary rounded-full hover:bg-highlight transition-all active:scale-90 duration-200"
-    >
-      <ChevronLeft size={24} />
-    </button>
-    <div class="flex flex-col gap-1">
+<div class="min-h-screen bg-bg-app pb-24 transition-colors duration-300 pt-6">
+  <main class="px-6 flex flex-col gap-6">
+    <!-- Page Title -->
+    <div>
       <h1
-        class="text-3xl font-heading font-extrabold text-text-primary capitalize"
+        class="text-3xl font-heading font-extrabold text-text-primary capitalize mb-1"
       >
         {title}
       </h1>
@@ -79,9 +79,7 @@
         {/if}
       </p>
     </div>
-  </header>
 
-  <main class="px-6 flex flex-col gap-6">
     <!-- Search Bar -->
     <div class="relative">
       <Search
@@ -96,8 +94,9 @@
       />
     </div>
 
-    {#each filteredHistory as item}
+    {#each filteredHistory as item, i}
       <div
+        use:reveal={{ delay: i * 50, x: 50 }}
         class="bg-surface p-4 rounded-[32px] border border-border-peach flex flex-col gap-4 relative overflow-hidden group hover:border-primary/30 transition-all shadow-sm"
       >
         <div class="flex gap-4">

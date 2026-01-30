@@ -11,10 +11,17 @@
     TrendingUp,
     History,
     ArrowLeft,
+    Wifi,
+    CreditCard,
+    Landmark,
+    Plus,
   } from "lucide-svelte";
   import { profileStore } from "$lib/stores/merchant";
   import { goto } from "$app/navigation";
   import { toast } from "$lib/stores/toast";
+  import { fly } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
+  import { reveal } from "$lib/actions/reveal";
 
   let balance = $state(1000);
   let showAddFunds = $state(false);
@@ -114,68 +121,115 @@
   }
 </script>
 
-<div class="min-h-screen bg-bg-app pb-24 transition-colors duration-300">
-  <header class="p-8">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <button
-          onclick={() => goto("/merchant/dashboard")}
-          class="p-2 -ml-2 rounded-full hover:bg-slate-100 text-text-primary transition-colors"
-        >
-          <ArrowLeft size={24} />
-        </button>
-        <div>
-          <h1 class="text-3xl font-heading font-extrabold text-text-primary">
-            Wallet
-          </h1>
-          <p class="text-text-secondary font-medium">Manage your budget.</p>
-        </div>
-      </div>
-      <div
-        class="p-3 bg-surface rounded-full shadow-sm border border-border-peach"
-      >
-        <Wallet class="text-primary" size={24} />
-      </div>
-    </div>
-  </header>
-
+<div class="min-h-screen bg-bg-app pb-24 transition-colors duration-300 pt-6">
   <main class="px-6 flex flex-col gap-6">
-    <!-- Balance Card -->
+    <!-- Realistic Digital Card -->
     <div
-      class="bg-primary p-8 rounded-[40px] text-white shadow-2xl shadow-primary/30 relative overflow-hidden"
+      use:reveal={{ delay: 0, x: 50 }}
+      class="group relative h-56 w-full rounded-[24px] overflow-hidden shadow-2xl shadow-slate-900/20 perspective-1000 transition-all hover:scale-[1.02] duration-500"
     >
+      <!-- Background Texture (Dark Premium) -->
       <div
-        class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"
+        class="absolute inset-0 bg-[#0f172a] bg-gradient-to-br from-slate-800 via-[#0f172a] to-black z-0"
+      ></div>
+      <div
+        class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30 mix-blend-overlay z-0"
       ></div>
 
-      <div class="flex flex-col gap-1 relative z-10">
-        <span class="text-xs font-bold uppercase tracking-widest opacity-80"
-          >Current Balance</span
-        >
-        <div
-          class="text-5xl font-heading font-extrabold flex items-center gap-2"
-        >
-          <span class="text-3xl opacity-70">₹</span>{balance}
+      <!-- Glossy Reflection -->
+      <div
+        class="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-10 group-hover:animate-shine left-[150%]"
+      ></div>
+
+      <!-- Content -->
+      <div class="relative z-10 p-6 flex flex-col justify-between h-full">
+        <div class="flex justify-between items-start">
+          <div class="flex items-center gap-2">
+            <div
+              class="text-white/80 font-bold font-mono tracking-widest text-lg"
+            >
+              Happen<span class="text-primary">o</span>
+            </div>
+          </div>
+          <div class="text-white/30 italic font-serif font-black">Debit</div>
+        </div>
+
+        <div class="flex items-center gap-4 pl-1">
+          <!-- EMV Chip -->
+          <div
+            class="w-12 h-9 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-lg shadow-inner border border-yellow-700/30 flex items-center justify-center relative overflow-hidden"
+          >
+            <div
+              class="absolute inset-0 border-[0.5px] border-black/20 rounded-lg m-[2px]"
+            ></div>
+            <div class="w-full h-[1px] bg-black/20 absolute top-1/3"></div>
+            <div class="w-full h-[1px] bg-black/20 absolute bottom-1/3"></div>
+            <div class="h-full w-[1px] bg-black/20 absolute left-1/3"></div>
+            <div class="h-full w-[1px] bg-black/20 absolute right-1/3"></div>
+          </div>
+          <!-- Contactless -->
+          <div class="rotate-90 opacity-60">
+            <Wifi size={24} class="text-white" />
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Balance -->
+          <div class="flex items-baseline gap-1">
+            <span class="text-gray-400 font-sans text-xl">₹</span>
+            <span
+              class="text-3xl text-white font-mono font-bold tracking-tight shadow-black drop-shadow-md"
+            >
+              {balance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+
+          <!-- Details -->
+          <div class="flex justify-between items-end">
+            <div>
+              <div
+                class="text-[8px] text-gray-500 uppercase tracking-widest mb-1"
+              >
+                Card Holder
+              </div>
+              <div
+                class="text-sm text-gray-200 font-medium tracking-wide uppercase font-mono"
+              >
+                {$profileStore.businessName || "MERCHANT ACCOUNT"}
+              </div>
+            </div>
+            <!-- Logo -->
+            <div class="flex items-center gap-1 opacity-80">
+              <div
+                class="w-8 h-8 rounded-full bg-red-500/90 mix-blend-lighten"
+              ></div>
+              <div
+                class="w-8 h-8 rounded-full bg-orange-500/90 mix-blend-lighten -ml-4"
+              ></div>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="mt-8 flex gap-3 relative z-10">
-        <button
-          onclick={() => (showAddFunds = true)}
-          class="flex-1 py-4 bg-white text-primary font-bold rounded-2xl shadow-lg active:scale-95 transition-all"
+    <!-- Actions Actions -->
+    <div class="" use:reveal={{ delay: 100, x: 50 }}>
+      <button
+        onclick={() => (showAddFunds = true)}
+        class="w-full bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center gap-3 active:scale-95 transition-all group hover:border-black/5"
+      >
+        <div
+          class="p-2 bg-black text-white rounded-full group-hover:scale-110 transition-transform"
         >
-          Add Funds
-        </button>
-        <button
-          class="p-4 bg-white/20 backdrop-blur-md text-white rounded-2xl active:scale-95 transition-all"
-        >
-          <TrendingUp size={24} />
-        </button>
-      </div>
+          <Plus size={20} />
+        </div>
+        <span class="font-bold text-slate-700 text-sm">Add Funds</span>
+      </button>
     </div>
 
     <!-- Subscription Plan -->
     <div
+      use:reveal={{ delay: 200, x: 50 }}
       class="bg-gradient-to-br from-purple-600 to-indigo-700 p-6 rounded-[32px] text-white shadow-xl relative overflow-hidden"
     >
       <div class="relative z-10">
@@ -217,7 +271,7 @@
     </div>
 
     <!-- Stats -->
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-2 gap-4" use:reveal={{ delay: 300, x: 50 }}>
       <div
         class="bg-surface p-6 rounded-[32px] border border-border-peach transition-colors duration-300"
       >
@@ -264,8 +318,9 @@
       </div>
 
       <div class="flex flex-col gap-3">
-        {#each transactions as tx}
+        {#each transactions as tx, i}
           <div
+            use:reveal={{ delay: 400 + i * 100, x: 50 }}
             class="bg-surface p-5 rounded-[28px] border border-border-peach flex items-center justify-between transition-colors duration-300"
           >
             <div class="flex items-center gap-4">
