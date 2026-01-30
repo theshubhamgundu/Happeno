@@ -28,6 +28,17 @@
 
   let timeRange = $state("7D"); // 24H, 7D, 1M, 1Y
 
+  // Calculate expiring offers (status is 'Expiring' or duration has 'h'/'m' and not 'D')
+  let expiringCount = $derived(
+    $activeOffersStore.filter(
+      (o) =>
+        o.status === "Expiring" ||
+        (o.expiry &&
+          (o.expiry.includes("h") || o.expiry.includes("m")) &&
+          !o.expiry.includes("D")),
+    ).length,
+  );
+
   // Mocked Data
   // We make stats derived so it updates when store changes
   let stats = $derived([
@@ -39,7 +50,7 @@
     },
     {
       label: "Expiring Soon",
-      value: "0",
+      value: expiringCount.toString(),
       subtext: "",
       icon: Clock,
       color: "text-urgency",
@@ -369,10 +380,10 @@
           </div>
         </div>
 
-        <div class="flex-1 flex flex-col justify-between py-1">
-          <div class="flex justify-between items-start">
+        <div class="flex-1 flex flex-col pt-1 min-w-0">
+          <div class="flex justify-between items-start mb-0.5">
             <h3
-              class="font-bold text-text-primary text-base line-clamp-2 leading-tight"
+              class="font-bold text-text-primary text-base line-clamp-1 leading-tight"
             >
               {offer.item}
             </h3>
@@ -384,8 +395,30 @@
             </div>
           </div>
 
+          {#if offer.description}
+            <p class="text-xs text-text-secondary line-clamp-1 mb-1">
+              {offer.description}
+            </p>
+          {/if}
+
+          <!-- Pricing -->
+          <div class="flex items-baseline gap-2 mb-2">
+            {#if offer.originalPrice}
+              <span class="text-xs text-text-muted line-through"
+                >₹{offer.originalPrice}</span
+              >
+            {/if}
+            <span class="text-sm font-black text-primary">
+              {#if offer.finalPrice}
+                ₹{offer.finalPrice}
+              {:else}
+                {offer.price || offer.discount}
+              {/if}
+            </span>
+          </div>
+
           <div
-            class="flex items-center gap-4 border-t border-border-peach pt-2 mt-1"
+            class="flex items-center gap-4 border-t border-dashed border-border-peach pt-2 mt-auto"
           >
             <div class="flex items-center gap-1.5 text-text-secondary">
               <Eye size={14} />
