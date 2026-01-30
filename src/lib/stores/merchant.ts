@@ -79,6 +79,15 @@ export interface MerchantProfile {
     zip: string;
     image: string | null;
     isPremium: boolean;
+    category: string;
+    type: 'veg' | 'non-veg' | 'both';
+    phone: string;
+    email: string;
+    approvalStatus: 'new' | 'pending' | 'approved' | 'rejected';
+    location: {
+        lat: number;
+        lng: number;
+    };
 }
 
 const initialProfile: MerchantProfile = {
@@ -88,7 +97,16 @@ const initialProfile: MerchantProfile = {
     state: "Telangana",
     zip: "500081",
     image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&q=80",
-    isPremium: false
+    isPremium: false,
+    category: "Restaurant",
+    type: "both",
+    phone: "9876543210",
+    email: "contact@paradise.com",
+    approvalStatus: "approved",
+    location: {
+        lat: 17.4460,
+        lng: 78.3880
+    }
 };
 
 export const menuItemsStore = writable<MenuItem[]>(initialMenuItems);

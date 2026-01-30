@@ -25,27 +25,8 @@
   } from "$lib/stores/merchant";
   import { fly, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { getHexFromLatLng, getHexNeighbors, NEARBY_DATA } from "$lib/geo";
 
   let timeRange = $state("7D"); // 24H, 7D, 1M, 1Y
-
-  // --- Geo-Tiling Logic (Merchant Side) ---
-  const merchantCoords = { lat: 17.446, lng: 78.388 }; // Paradise Biryani Coords
-  let currentZone = $derived(
-    getHexFromLatLng(merchantCoords.lat, merchantCoords.lng),
-  );
-  let neighboringZones = $derived(getHexNeighbors(currentZone, 1));
-
-  let zoneAnalytics = $derived.by(() => {
-    const inZone = NEARBY_DATA.filter((r) => r.hexId === currentZone.id).length;
-    const inNeighbors = NEARBY_DATA.filter((r) =>
-      neighboringZones.includes(r.hexId),
-    ).length;
-    return {
-      competitors: inZone - 1, // Exclude self
-      potentialReach: inNeighbors * 450, // Simulated reach per zone
-    };
-  });
 
   // Mocked Data
   // We make stats derived so it updates when store changes
@@ -142,6 +123,22 @@
               <Crown size={8} fill="currentColor" />
             </div>
           {/if}
+
+          <!-- Type Indicator (Veg/NonVeg) -->
+          <div
+            class="absolute bottom-0 right-0 z-10 p-0.5 bg-surface rounded-full shadow-sm"
+          >
+            {#if $profileStore.type === "veg"}
+              <div class="bg-green-600 rounded-full p-[2px]">
+                <div class="w-1.5 h-1.5 bg-surface rounded-full"></div>
+              </div>
+            {:else if $profileStore.type === "non-veg"}
+              <div class="bg-red-600 rounded-full p-[2px]">
+                <div class="w-1.5 h-1.5 bg-surface rounded-full"></div>
+              </div>
+            {/if}
+          </div>
+
           {#if $profileStore.image}
             <img
               src={$profileStore.image}
@@ -244,104 +241,6 @@
         </div>
       </div>
     </button>
-  </div>
-
-  <!-- Live Zone Dynamics (Next Level Geo-Insight) -->
-  <div
-    class="relative overflow-hidden bg-white p-6 rounded-[32px] border border-primary/10 shadow-[0_20px_40px_-15px_rgba(255,46,126,0.1)] group animate-float"
-    in:fly={{ y: 20, duration: 600, delay: 150, easing: cubicOut }}
-  >
-    <!-- Background Accents -->
-    <div
-      class="absolute -top-12 -right-12 w-32 h-32 bg-primary/5 blur-3xl rounded-full"
-    ></div>
-    <div
-      class="absolute inset-0 opacity-[0.03] hex-pattern pointer-events-none"
-    ></div>
-
-    <div class="relative flex flex-col gap-6">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div
-            class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary"
-          >
-            <Hexagon size={24} fill="currentColor" fill-opacity="0.1" />
-          </div>
-          <div>
-            <p
-              class="text-[10px] font-black text-primary uppercase tracking-[0.2em] leading-none mb-1"
-            >
-              Live Geospatial Status
-            </p>
-            <h2 class="text-xl font-black text-text-primary tracking-tight">
-              ZONE: <span class="text-primary"
-                >{currentZone.id.toUpperCase()}</span
-              >
-            </h2>
-          </div>
-        </div>
-        <div
-          class="px-3 py-1 bg-success/10 text-success rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 animate-pulse"
-        >
-          <div class="w-1.5 h-1.5 rounded-full bg-success"></div>
-          Active
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
-        <div
-          class="bg-highlight rounded-[24px] p-5 border border-border-peach flex flex-col gap-1"
-        >
-          <span
-            class="text-[10px] font-bold text-text-muted uppercase tracking-widest"
-            >Local Competitors</span
-          >
-          <p class="text-2xl font-black text-text-primary">
-            {zoneAnalytics.competitors}
-          </p>
-          <div
-            class="w-full h-1 bg-border-dark/10 rounded-full mt-2 overflow-hidden"
-          >
-            <div class="w-1/3 h-full bg-primary rounded-full"></div>
-          </div>
-        </div>
-        <div
-          class="bg-primary rounded-[24px] p-5 shadow-lg shadow-primary/20 flex flex-col gap-1"
-        >
-          <span
-            class="text-[10px] font-bold text-white/70 uppercase tracking-widest"
-            >Zone Reach</span
-          >
-          <p class="text-2xl font-black text-white">
-            {zoneAnalytics.potentialReach.toLocaleString()}
-          </p>
-          <p
-            class="text-[9px] font-black text-white/50 uppercase tracking-tighter"
-          >
-            Potential Viewers
-          </p>
-        </div>
-      </div>
-
-      <button
-        class="w-full bg-bg-app border border-border-dark/50 p-4 rounded-2xl flex items-center justify-between group/btn hover:border-primary transition-all"
-      >
-        <div class="flex items-center gap-3">
-          <div
-            class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-primary group-hover/btn:scale-110 transition-transform"
-          >
-            <TrendingUp size={16} />
-          </div>
-          <span class="text-xs font-black text-text-primary"
-            >Simulate reach in neighboring zones</span
-          >
-        </div>
-        <ChevronRight
-          size={16}
-          class="text-text-muted group-hover/btn:text-primary transition-colors"
-        />
-      </button>
-    </div>
   </div>
 
   <!-- Customer Reach Graph -->
@@ -570,20 +469,4 @@
 </div>
 
 <style>
-  .hex-pattern {
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45v-30z' fill='none' stroke='black' stroke-width='1'/%3E%3C/svg%3E");
-  }
-
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-  .animate-float {
-    animation: float 4s ease-in-out infinite;
-  }
 </style>

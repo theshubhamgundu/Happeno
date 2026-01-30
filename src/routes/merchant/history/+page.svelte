@@ -7,10 +7,14 @@
     Calendar,
     Eye,
     ThumbsUp,
+    Search,
+    UtensilsCrossed,
   } from "lucide-svelte";
   import { page } from "$app/stores";
 
   let filter = $derived($page.url.searchParams.get("filter") || "all");
+
+  let searchQuery = $state("");
 
   const history = [
     {
@@ -24,6 +28,8 @@
       views: 2400,
       likes: 150,
       expiry: "Ended",
+      image:
+        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80",
     },
     {
       id: "2",
@@ -36,6 +42,8 @@
       views: 850,
       likes: 80,
       expiry: "Ended",
+      image:
+        "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80",
     },
     {
       id: "3",
@@ -48,6 +56,8 @@
       views: 3200,
       likes: 450,
       expiry: "Ended",
+      image:
+        "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=400&q=80",
     },
     {
       id: "4",
@@ -60,6 +70,8 @@
       views: 1204,
       likes: 85,
       expiry: "2h 15m",
+      image:
+        "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80",
     },
     {
       id: "5",
@@ -72,6 +84,8 @@
       views: 850,
       likes: 120,
       expiry: "5h 30m",
+      image:
+        "https://images.unsplash.com/photo-1461023058926-03fcc68e60a0?auto=format&fit=crop&w=400&q=80",
     },
     {
       id: "6",
@@ -84,23 +98,34 @@
       views: 900,
       likes: 95,
       expiry: "30m",
+      image:
+        "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=400&q=80",
     },
   ];
 
   let filteredHistory = $derived.by(() => {
+    let matches = history;
+
+    // Search Filter
+    if (searchQuery) {
+      matches = matches.filter((h) =>
+        h.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+
     if (filter === "active")
-      return history.filter((h) => h.status === "Active");
+      return matches.filter((h) => h.status === "Active");
     if (filter === "expiring")
-      return history.filter(
+      return matches.filter(
         (h) =>
           h.status === "Expiring" ||
           (h.status === "Active" && h.expiry.includes("m")),
       );
     if (filter === "views")
-      return [...history].sort((a, b) => b.views - a.views);
+      return [...matches].sort((a, b) => b.views - a.views);
     if (filter === "likes")
-      return [...history].sort((a, b) => b.likes - a.likes);
-    return history;
+      return [...matches].sort((a, b) => b.likes - a.likes);
+    return matches;
   });
 
   let title = $derived.by(() => {
@@ -131,69 +156,95 @@
   </header>
 
   <main class="px-6 flex flex-col gap-6">
+    <!-- Search Bar -->
+    <div class="relative">
+      <Search
+        class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"
+        size={20}
+      />
+      <input
+        type="text"
+        bind:value={searchQuery}
+        placeholder="Search offers..."
+        class="w-full bg-surface border border-border-peach rounded-2xl py-3 pl-12 pr-4 text-text-primary focus:outline-none focus:border-primary/50 transition-all font-bold placeholder:font-normal"
+      />
+    </div>
+
     {#each filteredHistory as item}
       <div
-        class="bg-surface p-6 rounded-[32px] border border-border-peach flex flex-col gap-4 relative overflow-hidden group hover:border-primary/30 transition-all shadow-sm"
+        class="bg-surface p-4 rounded-[32px] border border-border-peach flex flex-col gap-4 relative overflow-hidden group hover:border-primary/30 transition-all shadow-sm"
       >
-        <div class="flex justify-between items-start">
-          <div class="flex flex-col gap-1">
-            <span
-              class="text-[10px] font-bold text-text-muted flex items-center gap-1 uppercase tracking-widest"
-            >
-              <Calendar size={10} />
-              {item.date}
-            </span>
-            <h3 class="text-lg font-bold text-text-primary leading-tight">
-              {item.title}
-            </h3>
-          </div>
-          <div class="flex flex-col items-end gap-1">
-            <div
-              class="px-3 py-1 bg-highlight text-primary text-[10px] font-extrabold uppercase tracking-widest rounded-full"
-            >
-              {item.price}
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="grid grid-cols-2 gap-4 py-4 border-y border-border-peach/50"
-        >
-          <div class="flex flex-col gap-1">
-            <span
-              class="text-[10px] font-bold text-text-muted uppercase tracking-widest text-[8px]"
-              >Engagement</span
-            >
-            <div class="flex gap-3">
+        <div class="flex gap-4">
+          <!-- Image -->
+          <div
+            class="w-24 h-24 bg-highlight rounded-2xl shrink-0 overflow-hidden relative"
+          >
+            {#if item.image}
+              <img
+                src={item.image}
+                alt={item.title}
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+            {:else}
               <div
-                class="flex items-center gap-1 text-sm font-bold text-text-primary"
+                class="w-full h-full flex items-center justify-center bg-highlight text-text-muted"
               >
-                <Eye size={14} class="text-blue-500" />
+                <UtensilsCrossed size={24} />
+              </div>
+            {/if}
+          </div>
+
+          <!-- Content -->
+          <div class="flex-1 flex flex-col gap-2">
+            <div class="flex justify-between items-start">
+              <div class="flex flex-col gap-1">
+                <span
+                  class="text-[10px] font-bold text-text-muted flex items-center gap-1 uppercase tracking-widest"
+                >
+                  <Calendar size={10} />
+                  {item.date}
+                </span>
+                <h3
+                  class="text-base font-bold text-text-primary leading-tight line-clamp-2"
+                >
+                  {item.title}
+                </h3>
+              </div>
+              <div
+                class="px-2 py-1 bg-highlight text-primary text-[10px] font-extrabold uppercase tracking-widest rounded-full whitespace-nowrap"
+              >
+                {item.price}
+              </div>
+            </div>
+
+            <!-- Stats Mini -->
+            <div class="flex items-center gap-3 mt-auto">
+              <div
+                class="flex items-center gap-1 text-xs font-bold text-text-secondary"
+              >
+                <Eye size={12} class="text-blue-500" />
                 {item.views}
               </div>
               <div
-                class="flex items-center gap-1 text-sm font-bold text-text-primary"
+                class="flex items-center gap-1 text-xs font-bold text-text-secondary"
               >
-                <ThumbsUp size={14} class="text-success" />
+                <ThumbsUp size={12} class="text-success" />
                 {item.likes}
               </div>
-            </div>
-          </div>
-          <div class="flex flex-col gap-1">
-            <span
-              class="text-[10px] font-bold text-text-muted uppercase tracking-widest text-[8px]"
-              >Total Reach</span
-            >
-            <div
-              class="flex items-center gap-1.5 text-text-primary font-bold text-sm"
-            >
-              <Users size={14} class="text-primary" />
-              {item.reach}
+              <div
+                class="flex items-center gap-1 text-xs font-bold text-text-secondary ml-auto"
+              >
+                <Users size={12} class="text-primary" />
+                {item.reach}
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="flex items-center justify-between">
+        <!-- Status Footer -->
+        <div
+          class="flex items-center justify-between border-t border-border-peach pt-3"
+        >
           <span
             class="text-xs font-bold flex items-center gap-1 {item.status ===
             'Active'
@@ -227,7 +278,7 @@
       >
         <HistoryIcon size={64} class="mb-4 text-text-muted" />
         <p class="font-bold text-text-secondary">
-          No offers found for "{filter}".
+          No offers found matching "{searchQuery}".
         </p>
       </div>
     {/if}
