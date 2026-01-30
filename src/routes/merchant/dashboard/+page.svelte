@@ -123,6 +123,22 @@
               <Crown size={8} fill="currentColor" />
             </div>
           {/if}
+
+          <!-- Type Indicator (Veg/NonVeg) -->
+          <div
+            class="absolute bottom-0 right-0 z-10 p-0.5 bg-surface rounded-full shadow-sm"
+          >
+            {#if $profileStore.type === "veg"}
+              <div class="bg-green-600 rounded-full p-[2px]">
+                <div class="w-1.5 h-1.5 bg-surface rounded-full"></div>
+              </div>
+            {:else if $profileStore.type === "non-veg"}
+              <div class="bg-red-600 rounded-full p-[2px]">
+                <div class="w-1.5 h-1.5 bg-surface rounded-full"></div>
+              </div>
+            {/if}
+          </div>
+
           {#if $profileStore.image}
             <img
               src={$profileStore.image}

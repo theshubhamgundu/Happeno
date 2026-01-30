@@ -14,6 +14,7 @@
   } from "lucide-svelte";
   import { profileStore } from "$lib/stores/merchant";
   import { goto } from "$app/navigation";
+  import { toast } from "$lib/stores/toast";
 
   let balance = $state(1000);
   let showAddFunds = $state(false);
@@ -78,15 +79,16 @@
 
     amountToAdd = "";
     showAddFunds = false;
+    toast.add(`Added ₹${amount} to wallet successfully!`, "success");
   }
 
   function handleBuyPremium() {
     if ($profileStore.isPremium) {
-      alert("You are already a Premium member!");
+      toast.add("You are already a Premium member!", "info");
       return;
     }
     if (balance < 500) {
-      alert("Insufficient balance! Please add funds.");
+      toast.add("Insufficient balance! Please add funds.", "warning");
       return;
     }
 
@@ -108,7 +110,7 @@
     // Update store
     $profileStore.isPremium = true;
 
-    alert("Premium subscription purchased successfully!");
+    toast.add("Premium subscription purchased successfully!", "success");
   }
 </script>
 

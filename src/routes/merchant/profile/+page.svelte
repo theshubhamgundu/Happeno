@@ -28,8 +28,9 @@
   import { cubicOut } from "svelte/easing";
   import { theme } from "$lib/stores/theme";
   import { profileStore } from "$lib/stores/merchant";
+  import { toast } from "$lib/stores/toast";
 
-  let businessName = $state("Paradise Biryani");
+  let isEditingDetails = $state(false);
 
   // Location State
   let street = $state("Plot 12, Hitec City Main Rd");
@@ -62,6 +63,25 @@
   function toggleTheme() {
     $theme = $theme === "dark" ? "light" : "dark";
   }
+
+  function submitForApproval() {
+    if (
+      !$profileStore.businessName ||
+      !$profileStore.phone ||
+      !$profileStore.email
+    ) {
+      toast.add("Please fill all required fields!", "error");
+      return;
+    }
+
+    // Simulate API call
+    $profileStore.approvalStatus = "pending";
+    isEditingDetails = false;
+    toast.add(
+      "Details submitted for approval! You will receive a confirmation once approved.",
+      "success",
+    );
+  }
 </script>
 
 <div
@@ -72,12 +92,28 @@
   <header
     class="relative px-6 pt-12 pb-8 flex flex-col items-center gap-4 text-center bg-surface rounded-b-[40px] shadow-sm z-10 transition-colors duration-300"
   >
-    <div
-      class="absolute top-4 right-4 text-xs font-bold text-success bg-success/10 px-3 py-1.5 rounded-full flex items-center gap-1"
-    >
-      <div class="w-2 h-2 rounded-full bg-success animate-pulse"></div>
-      Verified
-    </div>
+    <!-- Dynamic Verification Badge -->
+    {#if $profileStore.approvalStatus === "approved"}
+      <div
+        class="absolute top-4 right-4 text-xs font-bold text-success bg-success/10 px-3 py-1.5 rounded-full flex items-center gap-1"
+      >
+        <div class="w-2 h-2 rounded-full bg-success animate-pulse"></div>
+        Verified
+      </div>
+    {:else if $profileStore.approvalStatus === "pending"}
+      <div
+        class="absolute top-4 right-4 text-xs font-bold text-orange-500 bg-orange-50 px-3 py-1.5 rounded-full flex items-center gap-1"
+      >
+        <div class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
+        Pending Approval
+      </div>
+    {:else}
+      <div
+        class="absolute top-4 right-4 text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full flex items-center gap-1"
+      >
+        Unverified
+      </div>
+    {/if}
 
     <button
       onclick={() => goto("/merchant/dashboard")}
@@ -118,6 +154,32 @@
           <Crown size={16} fill="currentColor" />
         </div>
       {/if}
+
+      <!-- Veg/Non-Veg Indicator -->
+      <div
+        class="absolute -bottom-2 -left-2 z-20 bg-white p-1 rounded-full shadow-md border-4 border-bg-app"
+      >
+        {#if $profileStore.type === "veg"}
+          <div
+            class="border-2 border-green-600 p-0.5 rounded-sm w-4 h-4 flex items-center justify-center"
+          >
+            <div class="w-1.5 h-1.5 bg-green-600 rounded-full"></div>
+          </div>
+        {:else if $profileStore.type === "non-veg"}
+          <div
+            class="border-2 border-red-600 p-0.5 rounded-sm w-4 h-4 flex items-center justify-center"
+          >
+            <div class="w-1.5 h-1.5 bg-red-600 rounded-full"></div>
+          </div>
+        {:else}
+          <!-- Both -->
+          <div
+            class="border-2 border-orange-500 p-0.5 rounded-sm w-4 h-4 flex items-center justify-center"
+          >
+            <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+          </div>
+        {/if}
+      </div>
     </button>
     <input
       type="file"
@@ -131,7 +193,7 @@
 
     <div>
       <h1 class="text-2xl font-heading font-extrabold text-text-primary">
-        {businessName}
+        {$profileStore.businessName}
       </h1>
       <p class="text-sm font-bold text-text-secondary mt-1">
         Restaurant Profile
@@ -140,6 +202,157 @@
   </header>
 
   <main class="px-6 flex flex-col gap-8 mt-6">
+    <!-- Restaurant Details (Onboarding/Edit) -->
+    <div
+      class="space-y-4"
+      in:fly={{ y: 20, duration: 500, delay: 50, easing: cubicOut }}
+    >
+      <div class="flex items-center justify-between px-1">
+        <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
+          <div class="p-1.5 rounded-lg bg-primary/10 text-primary">
+            <Store size={18} />
+          </div>
+          Restaurant Details
+        </h2>
+        <button
+          onclick={() => (isEditingDetails = !isEditingDetails)}
+          class="text-xs font-bold text-primary hover:underline"
+        >
+          {isEditingDetails ? "Cancel" : "Edit"}
+        </button>
+      </div>
+
+      <div
+        class="bg-surface p-5 rounded-[28px] border border-border-peach shadow-sm hover:shadow-md transition-all duration-300"
+      >
+        {#if isEditingDetails}
+          <div class="flex flex-col gap-4" in:fly={{ y: 10, duration: 300 }}>
+            <Input
+              label="Restaurant Name"
+              bind:value={$profileStore.businessName}
+              placeholder="e.g. Paradise Biryani"
+            />
+
+            <div class="space-y-2">
+              <label
+                class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1"
+                >Category</label
+              >
+              <select
+                bind:value={$profileStore.category}
+                class="w-full p-4 bg-bg-app rounded-xl font-bold text-sm outline-none border border-transparent focus:border-primary transition-colors text-text-primary"
+              >
+                <option value="Restaurant">Restaurant</option>
+                <option value="Cafe">Cafe</option>
+                <option value="Fast Food">Fast Food</option>
+                <option value="Bakery">Bakery</option>
+                <option value="Cloud Kitchen">Cloud Kitchen</option>
+              </select>
+            </div>
+
+            <div class="space-y-2">
+              <label
+                class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1"
+                >Type</label
+              >
+              <div class="flex gap-2">
+                <button
+                  onclick={() => ($profileStore.type = "veg")}
+                  class="flex-1 py-3 rounded-xl border-2 font-bold text-sm transition-all {$profileStore.type ===
+                  'veg'
+                    ? 'border-success bg-success/10 text-success'
+                    : 'border-slate-100 text-slate-400'}">Pure Veg</button
+                >
+                <button
+                  onclick={() => ($profileStore.type = "non-veg")}
+                  class="flex-1 py-3 rounded-xl border-2 font-bold text-sm transition-all {$profileStore.type ===
+                  'non-veg'
+                    ? 'border-urgency bg-urgency/10 text-urgency'
+                    : 'border-slate-100 text-slate-400'}">Non-Veg</button
+                >
+                <button
+                  onclick={() => ($profileStore.type = "both")}
+                  class="flex-1 py-3 rounded-xl border-2 font-bold text-sm transition-all {$profileStore.type ===
+                  'both'
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-slate-100 text-slate-400'}">Both</button
+                >
+              </div>
+            </div>
+
+            <Input
+              label="Phone Number"
+              bind:value={$profileStore.phone}
+              placeholder="9876543210"
+              type="tel"
+            />
+            <Input
+              label="Email Address"
+              bind:value={$profileStore.email}
+              placeholder="contact@example.com"
+              type="email"
+            />
+
+            <Button onclick={submitForApproval} class="mt-2 py-3">
+              Submit for Approval
+            </Button>
+          </div>
+        {:else}
+          <div class="flex flex-col gap-4" in:fade={{ duration: 200 }}>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <div
+                  class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1"
+                >
+                  Category
+                </div>
+                <div class="text-sm font-bold text-text-primary">
+                  {$profileStore.category}
+                </div>
+              </div>
+              <div>
+                <div
+                  class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1"
+                >
+                  Type
+                </div>
+                <div class="text-sm font-bold text-text-primary capitalize">
+                  {$profileStore.type}
+                </div>
+              </div>
+              <div>
+                <div
+                  class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1"
+                >
+                  Phone
+                </div>
+                <div class="text-sm font-bold text-text-primary">
+                  {$profileStore.phone}
+                </div>
+              </div>
+              <div>
+                <div
+                  class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1"
+                >
+                  Email
+                </div>
+                <div class="text-sm font-bold text-text-primary truncate">
+                  {$profileStore.email}
+                </div>
+              </div>
+            </div>
+
+            {#if $profileStore.approvalStatus === "pending"}
+              <div
+                class="bg-orange-50 text-orange-600 p-3 rounded-xl text-xs font-bold text-center border border-orange-100"
+              >
+                Details under review by Admin
+              </div>
+            {/if}
+          </div>
+        {/if}
+      </div>
+    </div>
     <!-- Location Section (Detailed) -->
     <div
       class="space-y-4"
