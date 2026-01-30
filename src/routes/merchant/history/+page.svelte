@@ -9,99 +9,17 @@
     ThumbsUp,
     Search,
     UtensilsCrossed,
+    ChevronLeft,
   } from "lucide-svelte";
   import { page } from "$app/stores";
+  import { goto } from "$app/navigation";
+  import { activeOffersStore, pastOffersStore } from "$lib/stores/merchant";
 
   let filter = $derived($page.url.searchParams.get("filter") || "all");
 
   let searchQuery = $state("");
 
-  const history = [
-    {
-      id: "1",
-      title: "Weekend Flash Sale",
-      date: "21 Jan 2026",
-      reach: "1,240",
-      radius: "5km",
-      status: "Completed",
-      price: "₹200",
-      views: 2400,
-      likes: 150,
-      expiry: "Ended",
-      image:
-        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80",
-    },
-    {
-      id: "2",
-      title: "Evening Rush Offer",
-      date: "19 Jan 2026",
-      reach: "850",
-      radius: "3km",
-      status: "Completed",
-      price: "₹120",
-      views: 850,
-      likes: 80,
-      expiry: "Ended",
-      image:
-        "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80",
-    },
-    {
-      id: "3",
-      title: "New Launch Promo",
-      date: "15 Jan 2026",
-      reach: "2,100",
-      radius: "10km",
-      status: "Completed",
-      price: "₹500",
-      views: 3200,
-      likes: 450,
-      expiry: "Ended",
-      image:
-        "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=400&q=80",
-    },
-    {
-      id: "4",
-      title: "Spicy Chicken Burger",
-      date: "Today",
-      reach: "450",
-      radius: "3km",
-      status: "Active",
-      price: "₹199",
-      views: 1204,
-      likes: 85,
-      expiry: "2h 15m",
-      image:
-        "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80",
-    },
-    {
-      id: "5",
-      title: "Cold Coffee BOGO",
-      date: "Today",
-      reach: "120",
-      radius: "1km",
-      status: "Active",
-      price: "₹120",
-      views: 850,
-      likes: 120,
-      expiry: "5h 30m",
-      image:
-        "https://images.unsplash.com/photo-1461023058926-03fcc68e60a0?auto=format&fit=crop&w=400&q=80",
-    },
-    {
-      id: "6",
-      title: "Midnight Snack Deal",
-      date: "Tomorrow",
-      reach: "600",
-      radius: "5km",
-      status: "Expiring",
-      price: "₹150",
-      views: 900,
-      likes: 95,
-      expiry: "30m",
-      image:
-        "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=400&q=80",
-    },
-  ];
+  let history = $derived([...$activeOffersStore, ...$pastOffersStore]);
 
   let filteredHistory = $derived.by(() => {
     let matches = history;
@@ -109,12 +27,14 @@
     // Search Filter
     if (searchQuery) {
       matches = matches.filter((h) =>
-        h.title.toLowerCase().includes(searchQuery.toLowerCase()),
+        h.item.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
     if (filter === "active")
-      return matches.filter((h) => h.status === "Active");
+      return matches.filter(
+        (h) => !h.status || h.status === "Active" || h.status === "Expiring",
+      );
     if (filter === "expiring")
       return matches.filter(
         (h) =>
@@ -138,7 +58,13 @@
 </script>
 
 <div class="min-h-screen bg-bg-app pb-24 transition-colors duration-300">
-  <header class="p-8">
+  <header class="p-6 flex items-center gap-4">
+    <button
+      onclick={() => goto("/merchant/dashboard")}
+      class="p-2 -ml-2 text-text-muted hover:text-text-primary rounded-full hover:bg-highlight transition-all active:scale-90 duration-200"
+    >
+      <ChevronLeft size={24} />
+    </button>
     <div class="flex flex-col gap-1">
       <h1
         class="text-3xl font-heading font-extrabold text-text-primary capitalize"
@@ -182,7 +108,7 @@
             {#if item.image}
               <img
                 src={item.image}
-                alt={item.title}
+                alt={item.item}
                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               />
             {:else}
@@ -196,29 +122,56 @@
 
           <!-- Content -->
           <div class="flex-1 flex flex-col gap-2">
-            <div class="flex justify-between items-start">
-              <div class="flex flex-col gap-1">
+            <div>
+              <div class="flex justify-between items-start mb-1">
                 <span
                   class="text-[10px] font-bold text-text-muted flex items-center gap-1 uppercase tracking-widest"
                 >
                   <Calendar size={10} />
                   {item.date}
                 </span>
-                <h3
-                  class="text-base font-bold text-text-primary leading-tight line-clamp-2"
-                >
-                  {item.title}
-                </h3>
+                {#if item.discount}
+                  <span
+                    class="ml-2 px-1.5 py-0.5 bg-success/10 text-success text-[10px] font-black uppercase tracking-widest rounded-md whitespace-nowrap"
+                  >
+                    {item.discount}
+                  </span>
+                {/if}
               </div>
-              <div
-                class="px-2 py-1 bg-highlight text-primary text-[10px] font-extrabold uppercase tracking-widest rounded-full whitespace-nowrap"
+
+              <h3
+                class="text-base font-bold text-text-primary leading-tight line-clamp-1"
               >
-                {item.price}
+                {item.item}
+              </h3>
+
+              {#if item.description}
+                <p class="text-xs text-text-secondary line-clamp-2 mt-1">
+                  {item.description}
+                </p>
+              {/if}
+
+              <!-- Pricing -->
+              <div class="flex items-baseline gap-2 mt-2">
+                {#if item.originalPrice}
+                  <span class="text-xs text-text-muted line-through"
+                    >₹{item.originalPrice}</span
+                  >
+                {/if}
+                <span class="text-sm font-black text-primary">
+                  {#if item.finalPrice}
+                    ₹{item.finalPrice}
+                  {:else}
+                    {item.price || item.discount}
+                  {/if}
+                </span>
               </div>
             </div>
 
             <!-- Stats Mini -->
-            <div class="flex items-center gap-3 mt-auto">
+            <div
+              class="flex items-center gap-3 mt-auto pt-2 border-t border-dashed border-border-peach/50"
+            >
               <div
                 class="flex items-center gap-1 text-xs font-bold text-text-secondary"
               >
@@ -230,12 +183,6 @@
               >
                 <ThumbsUp size={12} class="text-success" />
                 {item.likes}
-              </div>
-              <div
-                class="flex items-center gap-1 text-xs font-bold text-text-secondary ml-auto"
-              >
-                <Users size={12} class="text-primary" />
-                {item.reach}
               </div>
             </div>
           </div>

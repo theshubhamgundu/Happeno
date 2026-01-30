@@ -12,6 +12,8 @@
         Zap,
         Clock,
         Tag,
+        Pencil,
+        AlertCircle,
     } from "lucide-svelte";
     import { goto } from "$app/navigation";
     import {
@@ -31,6 +33,9 @@
     let newItemPreview: string | null = $state(null);
     let fileInput: HTMLInputElement | undefined = $state();
 
+    let editingId = $state<number | null>(null);
+    let originalName = $state("");
+
     function handleImageSelect(e: Event) {
         const target = e.target as HTMLInputElement;
         if (target.files && target.files[0]) {
@@ -39,25 +44,68 @@
         }
     }
 
-    function addItem() {
+    // Check if item is in an active offer
+    function isItemActive(name: string): boolean {
+        return $activeOffersStore.some(
+            (o) => o.item === name && o.status !== "Completed",
+        );
+    }
+
+    function editItem(item: MenuItem) {
+        editingId = item.id;
+        originalName = item.name;
+        newItemName = item.name;
+        newItemPrice = item.price;
+        newItemDesc = item.desc || "";
+        newItemPreview = item.image;
+        newItemImage = null; // We use preview unless new file selected
+        showAddForm = true;
+    }
+
+    function handleSaveItem() {
         if (!newItemName || !newItemPrice) return;
 
-        menuItemsStore.update((items) => [
-            ...items,
-            {
-                id: Date.now(),
-                name: newItemName,
-                price: newItemPrice,
-                desc: newItemDesc,
-                image: newItemPreview,
-            },
-        ]);
+        if (editingId) {
+            // Update Existing
+            menuItemsStore.update((items) =>
+                items.map((item) => {
+                    if (item.id === editingId) {
+                        return {
+                            ...item,
+                            name: newItemName,
+                            price: newItemPrice,
+                            desc: newItemDesc,
+                            image: newItemPreview, // Updated preview (file or old url)
+                        };
+                    }
+                    return item;
+                }),
+            );
+        } else {
+            // Add New
+            menuItemsStore.update((items) => [
+                ...items,
+                {
+                    id: Date.now(),
+                    name: newItemName,
+                    price: newItemPrice,
+                    desc: newItemDesc,
+                    image: newItemPreview,
+                },
+            ]);
+        }
 
+        resetForm();
+    }
+
+    function resetForm() {
         newItemName = "";
         newItemPrice = "";
         newItemDesc = "";
         newItemImage = null;
         newItemPreview = null;
+        editingId = null;
+        originalName = "";
         showAddForm = false;
     }
 
@@ -83,22 +131,36 @@
     function publishOffer() {
         if (!selectedItemForOffer || !offerDiscountValue) return;
 
+        const original = parseFloat(selectedItemForOffer.price);
+        const discountVal = parseFloat(offerDiscountValue);
+        let final = original;
         let discountString = "";
+
         if (offerDiscountType === "percent") {
             discountString = `${offerDiscountValue}% OFF`;
+            final = original - (original * discountVal) / 100;
         } else {
             discountString = `₹${offerDiscountValue} OFF`;
+            final = original - discountVal;
         }
+
+        if (final < 0) final = 0;
 
         activeOffersStore.update((offers) => [
             {
                 id: Date.now(),
                 item: selectedItemForOffer!.name,
                 discount: discountString,
+                originalPrice: selectedItemForOffer!.price,
+                finalPrice: Math.round(final).toString(),
+                description: selectedItemForOffer!.desc,
                 expiry: offerDuration,
                 views: 0,
                 likes: 0,
                 image: selectedItemForOffer!.image,
+                status: "Active",
+                date: "Today",
+                reach: 0,
             },
             ...offers,
         ]);
@@ -159,10 +221,10 @@
                     <div
                         class="text-sm font-bold text-primary uppercase tracking-wider"
                     >
-                        Add New Dish
+                        {editingId ? "Edit Dish" : "Add New Dish"}
                     </div>
                     <button
-                        onclick={() => (showAddForm = false)}
+                        onclick={resetForm}
                         class="text-xs font-bold text-text-muted hover:text-text-secondary"
                         >Cancel</button
                     >
@@ -197,12 +259,29 @@
                             bind:value={newItemName}
                             class="py-2 text-sm"
                         />
-                        <Input
-                            placeholder="Price (₹)"
-                            type="number"
-                            bind:value={newItemPrice}
-                            class="py-2 text-sm"
-                        />
+                        <div class="space-y-1">
+                            <Input
+                                placeholder="Price (₹)"
+                                type="number"
+                                bind:value={newItemPrice}
+                                class="py-2 text-sm {editingId &&
+                                isItemActive(originalName)
+                                    ? 'opacity-50 cursor-not-allowed bg-gray-100'
+                                    : ''}"
+                                disabled={!!editingId &&
+                                    isItemActive(originalName)}
+                            />
+                            {#if editingId && isItemActive(originalName)}
+                                <div
+                                    class="flex items-start gap-1 text-[10px] text-urgency font-bold"
+                                >
+                                    <AlertCircle size={10} class="mt-0.5" />
+                                    <span
+                                        >Price locked: Item has active offer.</span
+                                    >
+                                </div>
+                            {/if}
+                        </div>
                     </div>
                 </div>
 
@@ -212,8 +291,10 @@
                     class="w-full p-4 bg-highlight rounded-2xl border-none outline-none text-sm font-medium resize-none h-20 placeholder:text-text-muted text-text-primary focus:ring-2 ring-primary/20 transition-all"
                 ></textarea>
 
-                <Button onclick={addItem} class="w-full py-3 text-sm font-bold"
-                    >Add to Menu</Button
+                <Button
+                    onclick={handleSaveItem}
+                    class="w-full py-3 text-sm font-bold"
+                    >{editingId ? "Update Item" : "Add to Menu"}</Button
                 >
             </div>
         {:else}
@@ -381,6 +462,13 @@
                                     {item.name}
                                 </h3>
                                 <div class="flex gap-1 -mr-2 -mt-2">
+                                    <button
+                                        onclick={() => editItem(item)}
+                                        class="p-2 text-text-muted hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors active:scale-90"
+                                        title="Edit Item"
+                                    >
+                                        <Pencil size={18} />
+                                    </button>
                                     <button
                                         onclick={() => openOfferForm(item)}
                                         class="p-2 text-text-muted hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors active:scale-90"

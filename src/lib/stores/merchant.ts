@@ -9,13 +9,20 @@ export interface MenuItem {
 }
 
 export interface Offer {
-    id: number;
-    item: string;
-    discount: string;
+    id: number | string;
+    item: string; // Title
+    discount?: string; // e.g. 20% OFF
+    price?: string; // e.g. ₹200 (Legacy/fallback)
+    originalPrice?: string; // Added: Real Price
+    finalPrice?: string; // Added: Offer Price
+    description?: string; // Added: Item Description
     expiry: string;
     views: number;
     likes: number;
-    image?: string | null; // Added image property
+    image?: string | null;
+    status: 'Active' | 'Expiring' | 'Completed';
+    date: string; // Created date or event date
+    reach?: string | number;
 }
 
 // Demo Data with Images
@@ -55,19 +62,70 @@ const initialOffers: Offer[] = [
         id: 101,
         item: "Hyderabadi Chicken Biryani",
         discount: "20% OFF",
+        originalPrice: "350",
+        finalPrice: "280",
+        description: "Authentic dum biryani cooked with basmati rice and tender chicken.",
         expiry: "4h 12m",
         views: 1240,
         likes: 85,
-        image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=400&q=80"
+        image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=400&q=80",
+        status: 'Active',
+        date: 'Today',
+        reach: 2500
     },
     {
         id: 102,
         item: "Family Feast Combo",
         discount: "₹150 OFF",
+        originalPrice: "850",
+        finalPrice: "700",
+        description: "Complete family meal with appetizer, main course and dessert.",
         expiry: "02:30:00",
         views: 850,
         likes: 120,
-        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80"
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80",
+        status: 'Expiring',
+        date: 'Today',
+        reach: 1800
+    }
+];
+
+const initialPastOffers: Offer[] = [
+    {
+        id: "1",
+        item: "Weekend Flash Sale",
+        date: "21 Jan 2026",
+        reach: "1,240",
+        status: "Completed",
+        price: "₹200",
+        views: 2400,
+        likes: 150,
+        expiry: "Ended",
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+        id: "2",
+        item: "Evening Rush Offer",
+        date: "19 Jan 2026",
+        reach: "850",
+        status: "Completed",
+        price: "₹120",
+        views: 850,
+        likes: 80,
+        expiry: "Ended",
+        image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+        id: "3",
+        item: "New Launch Promo",
+        date: "15 Jan 2026",
+        reach: "2,100",
+        status: "Completed",
+        price: "₹500",
+        views: 3200,
+        likes: 450,
+        expiry: "Ended",
+        image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=400&q=80",
     }
 ];
 
@@ -111,4 +169,5 @@ const initialProfile: MerchantProfile = {
 
 export const menuItemsStore = writable<MenuItem[]>(initialMenuItems);
 export const activeOffersStore = writable<Offer[]>(initialOffers);
+export const pastOffersStore = writable<Offer[]>(initialPastOffers);
 export const profileStore = writable<MerchantProfile>(initialProfile);
