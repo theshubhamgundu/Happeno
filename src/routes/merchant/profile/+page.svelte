@@ -20,11 +20,14 @@
     FileText,
     Info,
     ChevronRight,
+    ArrowLeft,
+    Crown,
   } from "lucide-svelte";
   import { goto } from "$app/navigation";
   import { fly, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import { theme } from "$lib/stores/theme";
+  import { profileStore } from "$lib/stores/merchant";
 
   let businessName = $state("Paradise Biryani");
 
@@ -77,17 +80,25 @@
     </div>
 
     <button
+      onclick={() => goto("/merchant/dashboard")}
+      class="absolute top-4 left-4 p-2 rounded-full hover:bg-slate-100 text-text-primary transition-colors"
+      aria-label="Go back"
+    >
+      <ArrowLeft size={24} />
+    </button>
+
+    <button
       onclick={() => dpInput.click()}
-      class="relative group w-28 h-28 bg-slate-50 rounded-[36px] border-4 border-surface shadow-xl flex items-center justify-center text-primary overflow-hidden cursor-pointer hover:border-primary/30 transition-all active:scale-95"
+      class="relative group w-28 h-28 bg-slate-50 rounded-[36px] border-4 border-surface shadow-xl flex items-center justify-center text-primary cursor-pointer hover:border-primary/30 transition-all active:scale-95"
     >
       {#if merchantDpPreview}
         <img
           src={merchantDpPreview}
           alt="Merchant DP"
-          class="w-full h-full object-cover"
+          class="w-full h-full object-cover rounded-[32px]"
         />
         <div
-          class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-[32px]"
         >
           <Camera size={24} class="text-white" />
         </div>
@@ -99,6 +110,14 @@
           <Edit2 size={10} />
         </div>
       {/if}
+
+      {#if $profileStore.isPremium}
+        <div
+          class="absolute -bottom-2 -right-2 z-20 bg-yellow-400 text-white p-1.5 rounded-full shadow-md border-4 border-bg-app"
+        >
+          <Crown size={16} fill="currentColor" />
+        </div>
+      {/if}
     </button>
     <input
       type="file"
@@ -107,6 +126,8 @@
       accept="image/*"
       onchange={handleDpSelect}
     />
+
+    <!-- Premium Badge logic moved inside the button -->
 
     <div>
       <h1 class="text-2xl font-heading font-extrabold text-text-primary">

@@ -78,6 +78,7 @@ export interface MerchantProfile {
     state: string;
     zip: string;
     image: string | null;
+    isPremium: boolean;
 }
 
 const initialProfile: MerchantProfile = {
@@ -86,7 +87,8 @@ const initialProfile: MerchantProfile = {
     city: "Hyderabad",
     state: "Telangana",
     zip: "500081",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&q=80"
+    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&q=80",
+    isPremium: false
 };
 
 export const menuItemsStore = writable<MenuItem[]>(initialMenuItems);
