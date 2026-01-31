@@ -1,31 +1,15 @@
 <script lang="ts">
   import {
-    LayoutDashboard,
-    Calendar,
-    Users,
     Zap,
-    TrendingUp,
-    MoreHorizontal,
     Eye,
     ThumbsUp,
     Clock,
-    Plus,
     History,
-    Wallet,
-    User,
     UtensilsCrossed,
-    Crown,
   } from "lucide-svelte";
-  import Button from "$lib/components/Button.svelte";
-  import DistrictHeader from "$lib/components/DistrictHeader.svelte";
   import { goto } from "$app/navigation";
-  import {
-    activeOffersStore,
-    menuItemsStore,
-    profileStore,
-  } from "$lib/stores/merchant";
-  import { fly, fade, slide, scale } from "svelte/transition";
-  import { cubicOut, elasticOut, backOut } from "svelte/easing";
+  import { activeOffersStore, menuItemsStore } from "$lib/stores/merchant";
+  import { reveal } from "$lib/actions/reveal";
 
   let timeRange = $state("7D"); // 24H, 7D, 1M, 1Y
 
@@ -50,14 +34,16 @@
     },
   ];
 
-  // Calculate expiring offers (status is 'Expiring' or duration has 'h'/'m' and not 'D')
+  // Calculate expiring offers (status is 'Expiring' or has short time-based expiry)
   let expiringCount = $derived(
     $activeOffersStore.filter(
       (o) =>
         o.status === "Expiring" ||
-        (o.expiry &&
-          (o.expiry.includes("h") || o.expiry.includes("m")) &&
-          !o.expiry.includes("D")),
+        (o.status === "Active" &&
+          o.expiry &&
+          (o.expiry.includes("h") ||
+            o.expiry.includes("m") ||
+            o.expiry.includes(":"))),
     ).length,
   );
 
@@ -111,7 +97,6 @@
       iconBg: "bg-highlight group-hover:bg-orange-50",
     },
   ]);
-  import { reveal } from "$lib/actions/reveal";
 </script>
 
 <div

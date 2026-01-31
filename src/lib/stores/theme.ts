@@ -1,26 +1,12 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
-type Theme = 'light' | 'dark';
+type Theme = 'light';
 
-const getInitialTheme = (): Theme => {
-    if (browser) {
-        const stored = localStorage.getItem('theme');
-        if (stored === 'light' || stored === 'dark') return stored;
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
-    }
-    return 'light';
-};
-
-export const theme = writable<Theme>(getInitialTheme());
+// Always use light theme
+export const theme = writable<Theme>('light');
 
 if (browser) {
-    theme.subscribe((value) => {
-        localStorage.setItem('theme', value);
-        if (value === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    });
+    // Ensure dark class is never applied
+    document.documentElement.classList.remove('dark');
 }

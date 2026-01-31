@@ -2,6 +2,7 @@
   import { cn } from "$lib/utils";
   import Toast from "$lib/components/Toast.svelte";
   import DistrictHeader from "$lib/components/DistrictHeader.svelte";
+  import InfiniteGrid from "$lib/components/InfiniteGrid.svelte";
   import { page } from "$app/stores";
 
   let { children } = $props();
@@ -15,7 +16,9 @@
   });
 </script>
 
-<div class="min-h-screen bg-bg-app flex flex-col">
+<div class="min-h-screen bg-bg-app flex flex-col relative">
+  <!-- Animated Background Grid -->
+  <InfiniteGrid />
   <Toast />
   <!-- Global Merchant Header -->
   {#if !$page.url.pathname.includes("/merchant/login")}
