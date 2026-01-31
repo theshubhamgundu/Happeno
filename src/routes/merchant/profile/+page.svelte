@@ -10,9 +10,6 @@
     Camera,
     Navigation,
     Clock,
-    Palette,
-    Moon,
-    Sun,
     HelpCircle,
     MessageCircle,
     MessageSquare,
@@ -26,7 +23,6 @@
   import { goto } from "$app/navigation";
   import { fly, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { theme } from "$lib/stores/theme";
   import { profileStore } from "$lib/stores/merchant";
   import { toast } from "$lib/stores/toast";
 
@@ -35,9 +31,9 @@
   // Location State
   let street = $state("Plot 12, Hitec City Main Rd");
   let city = $state("Hyderabad");
-  let state = $state("Telangana");
+  let stateProvince = $state("Telangana");
   let zip = $state("500081");
-  let fullAddress = $derived(`${street}, ${city}, ${state} - ${zip}`);
+  let fullAddress = $derived(`${street}, ${city}, ${stateProvince} - ${zip}`);
   let isEditingLocation = $state(false);
 
   // Timing State
@@ -58,10 +54,6 @@
       merchantDp = target.files[0];
       merchantDpPreview = URL.createObjectURL(merchantDp);
     }
-  }
-
-  function toggleTheme() {
-    $theme = $theme === "dark" ? "light" : "dark";
   }
 
   function submitForApproval() {
@@ -118,7 +110,7 @@
     <!-- Back Button Removed (Handled by Global Header) -->
 
     <button
-      onclick={() => dpInput.click()}
+      onclick={() => dpInput?.click()}
       class="relative group w-28 h-28 bg-slate-50 rounded-[36px] border-4 border-surface shadow-xl flex items-center justify-center text-primary cursor-pointer hover:border-primary/30 transition-all active:scale-95"
     >
       {#if merchantDpPreview}
@@ -379,7 +371,11 @@
             />
             <div class="grid grid-cols-2 gap-3">
               <Input label="City" bind:value={city} placeholder="City" />
-              <Input label="State" bind:value={state} placeholder="State" />
+              <Input
+                label="State"
+                bind:value={stateProvince}
+                placeholder="State"
+              />
             </div>
             <Input
               label="Zip Code"
@@ -509,42 +505,6 @@
           </div>
         {/if}
       </div>
-    </div>
-
-    <!-- Appearance -->
-    <div
-      class="space-y-4"
-      in:fly={{ y: 20, duration: 500, delay: 300, easing: cubicOut }}
-    >
-      <div class="flex items-center justify-between px-1">
-        <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
-          <div class="p-1.5 rounded-lg bg-pink-50 text-pink-500">
-            <Palette size={18} />
-          </div>
-          Appearance
-        </h2>
-      </div>
-      <button
-        onclick={toggleTheme}
-        class="w-full bg-surface p-5 rounded-[28px] border border-border-peach shadow-sm flex items-center justify-between hover:border-primary/50 transition-all duration-300 group active:scale-[0.98] scroll-smooth"
-      >
-        <div class="flex items-center gap-4">
-          <div
-            class="p-3 bg-slate-100 text-slate-600 rounded-2xl group-hover:bg-primary/10 group-hover:text-primary transition-colors"
-          >
-            {#if $theme === "dark"}
-              <Moon size={20} />
-            {:else}
-              <Sun size={20} />
-            {/if}
-          </div>
-          <div class="font-bold text-text-primary">Theme</div>
-        </div>
-        <div class="flex items-center gap-2 text-text-muted font-bold text-sm">
-          {$theme === "dark" ? "Dark" : "Light"}
-          <ChevronRight size={16} />
-        </div>
-      </button>
     </div>
 
     <!-- Support -->

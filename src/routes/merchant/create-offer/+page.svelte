@@ -155,7 +155,7 @@
         </div>
       {:else}
         <button
-          onclick={() => fileInput.click()}
+          onclick={() => fileInput?.click()}
           class="w-full aspect-video bg-surface/60 border-2 border-dashed border-border-peach rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-primary/50 hover:bg-surface hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group active:scale-[0.99]"
         >
           <div

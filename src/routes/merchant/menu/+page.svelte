@@ -174,35 +174,43 @@
     class="min-h-screen bg-bg-app pb-24 transition-colors duration-300 pt-6"
     in:fade={{ duration: 300, easing: cubicOut }}
 >
-    <main class="px-6 flex flex-col gap-6">
-        <!-- Page Title Block -->
-        <div class="flex items-center gap-3">
-            <h1
-                class="text-2xl font-bold text-text-primary flex items-center gap-3"
-            >
-                <UtensilsCrossed size={24} class="text-[#FF2E7E]" />
-                Menu Management
-            </h1>
-            <div
-                class="w-8 h-8 rounded-full bg-[#FF2E7E]/10 flex items-center justify-center font-bold text-sm text-[#FF2E7E]"
-            >
-                {$menuItemsStore.length}
+    <main class="px-4 md:px-8 lg:px-12 max-w-7xl mx-auto flex flex-col gap-6">
+        <!-- Page Header -->
+        <div
+            class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+        >
+            <div class="flex items-center gap-3">
+                <h1
+                    class="text-2xl font-bold text-text-primary flex items-center gap-3"
+                >
+                    <UtensilsCrossed size={24} class="text-[#FF2E7E]" />
+                    Menu Management
+                </h1>
+                <div
+                    class="w-8 h-8 rounded-full bg-[#FF2E7E]/10 flex items-center justify-center font-bold text-sm text-[#FF2E7E]"
+                >
+                    {$menuItemsStore.length}
+                </div>
             </div>
-        </div>
-        <!-- Search / Filter (Visual only) -->
-        <div class="relative">
-            <Search size={20} class="absolute left-4 top-3.5 text-text-muted" />
-            <input
-                type="text"
-                placeholder="Search items..."
-                class="w-full pl-12 pr-4 py-3 bg-surface rounded-xl border border-border-peach outline-none focus:border-primary font-medium text-text-primary placeholder:text-text-muted shadow-sm transition-all focus:shadow-md"
-            />
+
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-80">
+                <Search
+                    size={20}
+                    class="absolute left-4 top-3.5 text-text-muted"
+                />
+                <input
+                    type="text"
+                    placeholder="Search items..."
+                    class="w-full pl-12 pr-4 py-3 bg-surface rounded-xl border border-border-peach outline-none focus:border-primary font-medium text-text-primary placeholder:text-text-muted shadow-sm transition-all focus:shadow-md"
+                />
+            </div>
         </div>
 
         <!-- ADD ITEM FORM -->
         {#if showAddForm}
             <div
-                class="bg-surface p-5 rounded-[32px] border-2 border-primary/20 shadow-lg shadow-primary/5 space-y-4 transition-colors duration-300"
+                class="bg-surface p-5 rounded-[24px] border-2 border-primary/20 shadow-lg shadow-primary/5 space-y-4 transition-colors duration-300"
                 in:slide={{ axis: "y", duration: 400, easing: cubicOut }}
                 out:slide={{ axis: "y", duration: 300 }}
             >
@@ -413,7 +421,8 @@
             </div>
         {/if}
 
-        <div class="grid grid-cols-1 gap-4">
+        <!-- Menu Items Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {#each $menuItemsStore as item, i (item.id)}
                 <div
                     in:fly={{
@@ -422,10 +431,11 @@
                         delay: i * 100,
                         easing: quartOut,
                     }}
-                    class="bg-surface p-4 rounded-[24px] border border-border-peach shadow-sm flex gap-4 transition-all hover:border-primary/30 group hover:shadow-md hover:-translate-y-1 duration-300"
+                    class="bg-surface rounded-[24px] border border-border-peach shadow-sm overflow-hidden transition-all hover:border-primary/30 group hover:shadow-lg duration-300"
                 >
+                    <!-- Image -->
                     <div
-                        class="w-24 h-24 bg-highlight rounded-2xl shrink-0 overflow-hidden"
+                        class="w-full h-44 bg-highlight overflow-hidden relative"
                     >
                         {#if item.image}
                             <img
@@ -437,65 +447,73 @@
                             <div
                                 class="w-full h-full flex items-center justify-center text-text-muted"
                             >
-                                <UtensilsCrossed size={24} />
+                                <UtensilsCrossed size={32} />
                             </div>
                         {/if}
+
+                        <!-- Price Badge -->
+                        <div
+                            class="absolute bottom-3 left-3 px-3 py-1.5 bg-surface/90 backdrop-blur-sm rounded-xl font-black text-primary text-lg shadow-lg"
+                        >
+                            ₹{item.price}
+                        </div>
                     </div>
 
-                    <div class="flex-1 flex flex-col justify-between py-1">
-                        <div>
-                            <div class="flex justify-between items-start">
-                                <h3
-                                    class="font-bold text-text-primary text-lg line-clamp-1"
-                                >
-                                    {item.name}
-                                </h3>
-                                <div class="flex gap-1 -mr-2 -mt-2">
-                                    <button
-                                        onclick={() => editItem(item)}
-                                        class="p-2 text-text-muted hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors active:scale-90"
-                                        title="Edit Item"
-                                    >
-                                        <Pencil size={18} />
-                                    </button>
-                                    <button
-                                        onclick={() => openOfferForm(item)}
-                                        class="p-2 text-text-muted hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors active:scale-90"
-                                        title="Create Offer"
-                                    >
-                                        <Zap size={18} />
-                                    </button>
-                                    <button
-                                        onclick={() => deleteItem(item.id)}
-                                        class="p-2 text-text-muted hover:text-urgency hover:bg-urgency/5 rounded-lg transition-colors active:scale-90"
-                                        title="Delete Item"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
-                                </div>
-                            </div>
-                            <p
-                                class="text-xs text-text-muted font-medium line-clamp-2 mt-1"
+                    <!-- Content -->
+                    <div class="p-4 flex flex-col gap-2">
+                        <div class="flex justify-between items-start">
+                            <h3
+                                class="font-bold text-text-primary text-lg line-clamp-1 flex-1"
                             >
-                                {item.desc || "No description provided."}
-                            </p>
+                                {item.name}
+                            </h3>
                         </div>
-                        <div class="font-black text-primary text-lg">
-                            ₹{item.price}
+
+                        <p
+                            class="text-xs text-text-muted font-medium line-clamp-2 min-h-[2.5rem]"
+                        >
+                            {item.desc || "No description provided."}
+                        </p>
+
+                        <!-- Actions -->
+                        <div
+                            class="flex items-center justify-end gap-1 pt-3 border-t border-border-peach mt-auto"
+                        >
+                            <button
+                                onclick={() => editItem(item)}
+                                class="p-2.5 text-text-muted hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-colors active:scale-90"
+                                title="Edit Item"
+                            >
+                                <Pencil size={18} />
+                            </button>
+                            <button
+                                onclick={() => openOfferForm(item)}
+                                class="p-2.5 text-text-muted hover:text-orange-500 hover:bg-orange-50 rounded-xl transition-colors active:scale-90"
+                                title="Create Offer"
+                            >
+                                <Zap size={18} />
+                            </button>
+                            <button
+                                onclick={() => deleteItem(item.id)}
+                                class="p-2.5 text-text-muted hover:text-urgency hover:bg-urgency/5 rounded-xl transition-colors active:scale-90"
+                                title="Delete Item"
+                            >
+                                <Trash2 size={18} />
+                            </button>
                         </div>
                     </div>
                 </div>
             {/each}
-
-            {#if $menuItemsStore.length === 0 && !showAddForm}
-                <div
-                    class="py-12 text-center flex flex-col items-center opacity-50"
-                >
-                    <Store size={48} class="text-text-muted mb-4" />
-                    <p class="text-text-muted font-bold">Your menu is empty.</p>
-                </div>
-            {/if}
         </div>
+
+        {#if $menuItemsStore.length === 0 && !showAddForm}
+            <div
+                class="py-12 text-center flex flex-col items-center opacity-50"
+            >
+                <Store size={48} class="text-text-muted mb-4" />
+                <p class="text-text-muted font-bold">Your menu is empty.</p>
+            </div>
+        {/if}
     </main>
 </div>
 
