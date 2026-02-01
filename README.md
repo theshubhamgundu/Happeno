@@ -1,5 +1,4 @@
-# Happeno — Discover Your Street Pulse
-
+# Happeno —
 Happeno is a hyper-local, real-time platform designed to bridge the gap between local merchants and nearby customers. It turns every street into a living marketplace where exclusive, time-sensitive offers come to life.
 
 ## 🌟 The Vision
