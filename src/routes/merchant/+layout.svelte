@@ -4,8 +4,25 @@
   import DistrictHeader from "$lib/components/DistrictHeader.svelte";
   import InfiniteGrid from "$lib/components/InfiniteGrid.svelte";
   import { page } from "$app/stores";
+  import { liveOrdersStore } from "$lib/stores/merchant";
+  import { audioService } from "$lib/services/audio";
+  import { appSettingsStore } from "$lib/stores/settings";
+  import { onMount } from "svelte";
 
   let { children } = $props();
+
+  let lastOrderCount = 0;
+
+  onMount(() => {
+    appSettingsStore.load();
+    const unsubscribe = liveOrdersStore.subscribe(orders => {
+        if (orders.length > lastOrderCount && $appSettingsStore.soundAlerts) {
+            audioService.play('order_new');
+        }
+        lastOrderCount = orders.length;
+    });
+    return unsubscribe;
+  });
 
   let activeTab = $derived.by(() => {
     const path = $page.url.pathname;

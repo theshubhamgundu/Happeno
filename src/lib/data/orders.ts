@@ -151,7 +151,10 @@ export function getKitchenTicketByOrderId(orderId: string): KitchenTicket | unde
     return mockKitchenTickets.find(ticket => ticket.orderId === orderId);
 }
 
-export function formatOrderTime(date: Date): string {
+export function formatOrderTime(dateValue: Date | string): string {
+    const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
+    if (isNaN(date.getTime())) return 'Now';
+
     return date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
@@ -159,6 +162,9 @@ export function formatOrderTime(date: Date): string {
     });
 }
 
-export function getElapsedTime(date: Date): number {
+export function getElapsedTime(dateValue: Date | string): number {
+    const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
+    if (isNaN(date.getTime())) return 0;
+
     return Math.floor((Date.now() - date.getTime()) / 60000);
 }

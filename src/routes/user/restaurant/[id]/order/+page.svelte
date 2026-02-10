@@ -22,6 +22,13 @@
     } from "lucide-svelte";
     import { confetti } from "$lib/actions/confetti"; // Simulated action
 
+    // Modular Components
+    import SuccessOverlay from "$lib/components/restaurant/SuccessOverlay.svelte";
+    import OrderStatusTracker from "$lib/components/restaurant/OrderStatusTracker.svelte";
+    import FloatingBillBar from "$lib/components/restaurant/FloatingBillBar.svelte";
+    import MenuCard from "$lib/components/restaurant/MenuCard.svelte";
+    import MenuCategoryBar from "$lib/components/restaurant/MenuCategoryBar.svelte";
+
     interface CartItem {
         id: number;
         name: string;
@@ -171,25 +178,50 @@
     );
     const cartCount = $derived(cart.reduce((acc, item) => acc + item.qty, 0));
 
+    import { dbService } from "$lib/services/db";
+    import type { Order } from "$lib/types";
+
     async function placeOrder() {
         orderStatus = "placing";
         showCartFloating = false;
 
-        // Simulate API call
-        await new Promise((r) => setTimeout(r, 1800));
+        const newOrder: Order = {
+            id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+            restaurantId: $page.params.id,
+            tableNumber: tableNumber,
+            items: cart.map(item => ({
+                menuItemId: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.qty
+            })),
+            subtotal: cartTotal,
+            tax: Math.round(cartTotal * 0.05),
+            serviceCharge: Math.round(cartTotal * 0.05),
+            total: Math.round(cartTotal * 1.1),
+            status: 'pending',
+            paymentStatus: 'pending',
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
 
-        orderStatus = "confirmed";
-        showSuccessScreen = true;
+        const result = await dbService.placeOrder(newOrder);
 
-        // Clear cart after success animation begins
-        setTimeout(() => {
-            cart = [];
-            // Auto hide success screen after 3 seconds
+        if (result.success) {
+            orderStatus = "confirmed";
+            showSuccessScreen = true;
+            localStorage.setItem(`current_order_${$page.params.id}`, JSON.stringify(newOrder));
+
+            // Clear cart after success animation begins
             setTimeout(() => {
-                showSuccessScreen = false;
-                orderStatus = "preparing";
-            }, 3000);
-        }, 500);
+                cart = [];
+                // Auto hide success screen after 3 seconds
+                setTimeout(() => {
+                    showSuccessScreen = false;
+                    orderStatus = "preparing";
+                }, 3000);
+            }, 500);
+        }
     }
 </script>
 
@@ -238,21 +270,7 @@
             />
         </div>
 
-        <div
-            class="flex gap-2 overflow-x-auto no-scrollbar mt-4 -mx-5 px-5 py-2"
-        >
-            {#each categories as cat}
-                <button
-                    onclick={() => (activeCategory = cat)}
-                    class="flex-shrink-0 px-5 py-2.5 rounded-xl text-xs font-black transition-all {activeCategory ===
-                    cat
-                        ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105'
-                        : 'bg-white text-gray-400 border border-gray-100'}"
-                >
-                    {cat}
-                </button>
-            {/each}
-        </div>
+        <MenuCategoryBar {categories} bind:activeCategory />
     </header>
 
     <!-- Menu List -->
@@ -261,243 +279,36 @@
             {#each menu.filter((m) => (activeCategory === "Best Sellers" ? m.bestSeller : m.category === activeCategory) && m.name
                         .toLowerCase()
                         .includes(searchQuery.toLowerCase())) as dish}
-                <div
-                    class="bg-white rounded-[28px] p-4 flex gap-4 shadow-xl shadow-gray-200/50 border border-gray-50 group active:scale-[0.98] transition-all relative overflow-hidden"
-                >
-                    {#if dish.bestSeller}
-                        <div class="absolute top-0 right-0 p-2">
-                            <span
-                                class="bg-orange-100 text-orange-600 text-[8px] font-black px-2 py-0.5 rounded-bl-xl uppercase tracking-tighter"
-                                >Bestseller</span
-                            >
-                        </div>
-                    {/if}
-                    <div
-                        class="w-24 h-24 rounded-2xl overflow-hidden shrink-0 relative"
-                    >
-                        <img
-                            src={dish.img}
-                            alt={dish.name}
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        />
-                        <div
-                            class="absolute top-2 left-2 w-4 h-4 rounded-sm border border-gray-200 bg-white flex items-center justify-center"
-                        >
-                            <div
-                                class="w-1.5 h-1.5 rounded-full {dish.type ===
-                                'veg'
-                                    ? 'bg-green-600'
-                                    : 'bg-red-600'}"
-                            ></div>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h3
-                                class="font-black text-gray-900 text-base leading-tight truncate"
-                            >
-                                {dish.name}
-                            </h3>
-                            <div
-                                class="flex items-center gap-0.5 text-yellow-500 font-black text-xs"
-                            >
-                                <Star size={12} fill="currentColor" />
-                                <span>{dish.rating}</span>
-                            </div>
-                        </div>
-                        <p
-                            class="text-gray-400 text-[10px] leading-relaxed mt-1 line-clamp-2 font-medium italic"
-                        >
-                            "{dish.desc}"
-                        </p>
-                        <div class="flex justify-between items-center mt-3">
-                            <p class="text-primary font-black text-base">
-                                ₹{dish.price}
-                            </p>
-
-                            {#if cart.find((i) => i.id === dish.id)}
-                                <div
-                                    class="flex items-center gap-3 bg-primary rounded-xl px-2 py-1.5 text-white shadow-md"
-                                >
-                                    <button
-                                        onclick={() => removeFromCart(dish)}
-                                        class="w-6 h-6 flex items-center justify-center"
-                                        ><Minus size={14} /></button
-                                    >
-                                    <span
-                                        class="text-sm font-black w-4 text-center"
-                                        >{cart.find((i) => i.id === dish.id)
-                                            .qty}</span
-                                    >
-                                    <button
-                                        onclick={() => addToCart(dish)}
-                                        class="w-6 h-6 flex items-center justify-center"
-                                        ><Plus size={14} /></button
-                                    >
-                                </div>
-                            {:else}
-                                <button
-                                    onclick={() => addToCart(dish)}
-                                    class="bg-white border-2 border-primary/20 text-primary font-black px-6 py-2 rounded-xl text-xs hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm"
-                                >
-                                    ADD +
-                                </button>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
+                <MenuCard
+                    {dish}
+                    quantity={cart.find((i) => i.id === dish.id)?.qty || 0}
+                    onAdd={() => addToCart(dish)}
+                    onRemove={() => removeFromCart(dish)}
+                />
             {/each}
         </div>
     </main>
 
     <!-- Success Screen Overlay -->
-    {#if showSuccessScreen}
-        <div
-            class="fixed inset-0 z-[100] flex items-center justify-center p-6"
-            transition:fade={{ duration: 300 }}
-        >
-            <div class="absolute inset-0 bg-white/80 backdrop-blur-2xl"></div>
-            <div
-                class="relative text-center space-y-8"
-                in:scale={{ start: 0.5, duration: 600, easing: backOut }}
-            >
-                <div class="relative inline-block">
-                    <div
-                        class="absolute inset-0 bg-emerald-100 rounded-full scale-150 animate-ping opacity-20"
-                    ></div>
-                    <div
-                        class="w-32 h-32 bg-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/30"
-                    >
-                        <CheckCircle2 size={64} class="text-white" />
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <h2
-                        class="text-4xl font-black text-gray-900 tracking-tighter"
-                    >
-                        ORDER PLACED!
-                    </h2>
-                    <p
-                        class="text-gray-400 font-bold uppercase tracking-[0.2em] text-xs"
-                    >
-                        Ticket #HAP-429 • Table {tableNumber}
-                    </p>
-                </div>
-
-                <div
-                    class="flex items-center justify-center gap-2 text-emerald-600 bg-emerald-50 px-6 py-3 rounded-full font-black text-xs mx-auto w-fit"
-                >
-                    <PartyPopper size={16} />
-                    <span>CHEF IS ON IT!</span>
-                </div>
-            </div>
-        </div>
-    {/if}
+    <SuccessOverlay 
+        show={showSuccessScreen} 
+        {tableNumber} 
+        restaurantId={$page.params.id}
+        onClose={() => showSuccessScreen = false}
+    />
 
     <!-- Floating Order Status -->
-    {#if orderStatus !== "idle" && !showSuccessScreen}
-        <div
-            in:fly={{ y: 50, duration: 500 }}
-            class="fixed bottom-24 left-4 right-4 bg-white rounded-[32px] p-5 shadow-2xl border border-gray-100 z-[60]"
-        >
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 relative overflow-hidden"
-                    >
-                        {#if orderStatus === "placing" || orderStatus === "confirmed" || orderStatus === "preparing"}
-                            <div
-                                class="absolute inset-0 bg-emerald-500/10 animate-pulse"
-                            ></div>
-                            <Clock size={24} class="relative" />
-                        {:else if orderStatus === "ready"}
-                            <CheckCircle2 size={24} class="relative" />
-                        {/if}
-                    </div>
-                    <div>
-                        <h4 class="font-black text-gray-900 text-sm">
-                            {orderStatus === "confirmed"
-                                ? "Order Confirmed!"
-                                : orderStatus === "preparing"
-                                  ? "Chef is cooking..."
-                                  : orderStatus === "placing"
-                                    ? "Placing Order..."
-                                    : "Order is Ready!"}
-                        </h4>
-                        <p
-                            class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-0.5"
-                        >
-                            {orderStatus === "preparing"
-                                ? `Preparing • ${waitingTime} mins left`
-                                : "Freshly prepared for you"}
-                        </p>
-                    </div>
-                </div>
-                {#if orderStatus === "ready"}
-                    <span
-                        class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-black animate-bounce"
-                        >NOTIFIED</span
-                    >
-                {/if}
-            </div>
-
-            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                    class="h-full bg-emerald-500 transition-all duration-1000"
-                    style="width: {orderStatus === 'confirmed'
-                        ? '20%'
-                        : orderStatus === 'preparing'
-                          ? '65%'
-                          : orderStatus === 'placing'
-                            ? '5%'
-                            : '100%'}"
-                ></div>
-            </div>
-        </div>
+    {#if !showSuccessScreen}
+        <OrderStatusTracker {orderStatus} {waitingTime} />
     {/if}
 
     <!-- Cart Bar -->
-    {#if cartCount > 0 && orderStatus === "idle"}
-        <div
-            in:fly={{ y: 100, duration: 400 }}
-            class="fixed bottom-4 left-4 right-4 z-[70]"
-        >
-            <button
-                onclick={() => (showCartFloating = true)}
-                class="w-full bg-gray-900 text-white p-5 rounded-[28px] flex items-center justify-between shadow-2xl active:scale-95 transition-all group overflow-hidden relative"
-            >
-                <div class="flex items-center gap-4 relative">
-                    <div
-                        class="bg-primary w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20"
-                    >
-                        <ShoppingBag size={22} />
-                        <span
-                            class="absolute -top-1 -right-1 bg-white text-primary text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-lg border-2 border-primary"
-                            >{cartCount}</span
-                        >
-                    </div>
-                    <div class="text-left">
-                        <p
-                            class="text-[10px] font-black uppercase tracking-widest opacity-50 mb-0.5"
-                        >
-                            Bill Amount
-                        </p>
-                        <p class="text-xl font-black">₹{cartTotal}</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2 relative">
-                    <span class="text-sm font-black uppercase tracking-widest"
-                        >PROCEED</span
-                    >
-                    <ArrowRight
-                        size={20}
-                        class="group-hover:translate-x-1 transition-transform"
-                    />
-                </div>
-            </button>
-        </div>
+    {#if orderStatus === "idle"}
+        <FloatingBillBar
+            {cartCount}
+            {cartTotal}
+            onClick={() => (showCartFloating = true)}
+        />
     {/if}
 
     <!-- Cart Drawer -->

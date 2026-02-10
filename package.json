@@ -12,10 +12,14 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
+		"@capacitor/assets": "^3.0.5",
+		"@capacitor/cli": "^8.0.2",
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/kit": "^2.49.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tailwindcss/vite": "^4.1.17",
+		"@types/canvas-confetti": "^1.9.0",
+		"@types/qrcode": "^1.5.6",
 		"svelte": "^5.45.6",
 		"svelte-check": "^4.3.4",
 		"tailwindcss": "^4.1.17",
@@ -23,14 +27,21 @@
 		"vite": "^7.2.6"
 	},
 	"dependencies": {
+		"@capacitor/android": "^8.0.2",
+		"@capacitor/core": "^8.0.2",
 		"@supabase/ssr": "^0.8.0",
 		"@supabase/supabase-js": "^2.91.0",
+		"@sveltejs/adapter-static": "^3.0.10",
+		"canvas-confetti": "^1.9.4",
 		"firebase": "^12.8.0",
 		"gsap": "^3.14.2",
+		"html2canvas": "^1.4.1",
+		"jspdf": "^4.1.0",
 		"leaflet": "^1.9.4",
 		"lottie-web": "^5.13.0",
 		"lucide-svelte": "^0.562.0",
 		"mapbox-gl": "^3.18.1",
+		"qrcode": "^1.5.4",
 		"razorpay": "^2.9.6",
 		"svelte-motion": "^0.12.2"
 	}

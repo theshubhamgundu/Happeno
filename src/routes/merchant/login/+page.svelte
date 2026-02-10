@@ -32,7 +32,11 @@
     // Simulate API call
     setTimeout(() => {
       loading = false;
-      goto("/merchant/dashboard");
+      if (isLogin) {
+        goto("/merchant/dashboard");
+      } else {
+        goto("/merchant/onboarding");
+      }
     }, 800);
   }
 

@@ -5,12 +5,20 @@
   import Button from "$lib/components/Button.svelte";
 
   let mounted = $state(false);
+  let checkingSession = $state(true);
 
   onMount(() => {
-    mounted = true;
+    const saved = localStorage.getItem("userLocation");
+    if (saved) {
+      goto("/user/nearby");
+    } else {
+      checkingSession = false;
+      mounted = true;
+    }
   });
 </script>
 
+{#if !checkingSession}
 <div
   class="relative min-h-screen w-full overflow-hidden bg-bg-app flex flex-col items-center justify-center p-6 text-center"
 >
@@ -91,6 +99,7 @@
     Your city is happening
   </p>
 </div>
+{/if}
 
 <style>
   @keyframes float {

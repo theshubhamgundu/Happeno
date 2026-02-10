@@ -23,6 +23,10 @@
     } from "$lib/stores/merchant";
     import type { Order } from "$lib/types";
 
+    import { dbService } from "$lib/services/db";
+    import { pdfService } from "$lib/services/pdf";
+    import { profileStore } from "$lib/stores/merchant";
+
     let activeFilter = $state("active"); // active, completed
     let showBillModal = $state(false);
     let selectedOrder = $state<Order | null>(null);
@@ -32,22 +36,25 @@
     );
 
     function handleAction(order: Order) {
-        if (order.status === "ready") {
-            liveOrdersStore.update((orders) =>
-                orders.map((o) =>
-                    o.id === order.id ? { ...o, status: "served" } : o,
-                ),
-            );
+        if (order.status === "pending") {
+            dbService.updateOrderStatus(order.id, 'preparing');
+        } else if (order.status === "preparing") {
+            dbService.updateOrderStatus(order.id, 'ready');
+        } else if (order.status === "ready") {
+            dbService.updateOrderStatus(order.id, 'served');
         } else if (order.status === "served") {
             selectedOrder = order;
             showBillModal = true;
         }
     }
 
-    function settlePayment(method: string) {
+    async function settlePayment(method: string) {
         if (!selectedOrder) return;
 
-        // Update stores
+        // 1. Generate PDF Bill
+        await pdfService.generateBill(selectedOrder, $profileStore.businessName);
+
+        // 2. Clear from live and move to completed (via DB Service locally)
         liveOrdersStore.update((orders) =>
             orders.filter((o) => o.id !== selectedOrder!.id),
         );
@@ -57,11 +64,12 @@
                 status: "completed",
                 paymentStatus: "paid",
                 paymentMethod: method as any,
+                updatedAt: new Date()
             },
             ...orders,
         ]);
 
-        // Update global stats
+        // 3. Update global stats
         merchantStatsStore.update((s) => ({
             ...s,
             liveOrders: s.liveOrders - 1,

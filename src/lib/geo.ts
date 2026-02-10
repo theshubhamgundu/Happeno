@@ -39,6 +39,17 @@ export function getHexNeighbors(hex: HexCoord, k: number = 1): string[] {
     return neighbors;
 }
 
+/**
+ * Converts a physical radius (km) to the number of hexagonal rings needed.
+ * This is the bridge between merchant "Broadcast Radius" and technical "Hex Rings".
+ */
+export function getHexesInRadius(lat: number, lng: number, radiusKm: number): string[] {
+    const centerHex = getHexFromLatLng(lat, lng);
+    // Rough estimate: Each hex with HEX_SIZE 0.01 covers ~1.1km
+    const k = Math.ceil(radiusKm / 1.1);
+    return getHexNeighbors(centerHex, k);
+}
+
 export const MOCK_RESTAURANTS_DATA = [
     {
         id: 1,

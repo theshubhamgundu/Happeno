@@ -9,6 +9,16 @@
   let step = $state<"phone" | "otp">("phone");
   let loading = $state(false);
   let error = $state("");
+  let checkingSession = $state(true);
+
+  onMount(() => {
+    const saved = localStorage.getItem("userLocation");
+    if (saved) {
+      goto("/user/nearby");
+    } else {
+      checkingSession = false;
+    }
+  });
 
   async function handleSendOTP() {
     if (!phone || phone.length < 10) {
@@ -41,6 +51,7 @@
   }
 </script>
 
+{#if !checkingSession}
 <div class="min-h-screen bg-bg-app text-text-primary flex flex-col">
   <!-- Header -->
   <header class="px-6 pt-12 pb-8 text-center">
@@ -170,10 +181,10 @@
     {/if}
   </main>
 
-  <!-- Footer -->
   <footer class="px-6 py-8 text-center">
     <p class="text-xs text-text-muted">
       🏷️ Find exclusive offers from 500+ restaurants in Hyderabad
     </p>
   </footer>
 </div>
+{/if}
