@@ -94,7 +94,7 @@
             class="absolute inset-0 w-full h-full object-cover opacity-80"
             playsinline
             muted
-        />
+        ></video>
 
         <!-- Animated Scanner Frame -->
         <div class="absolute inset-0 flex items-center justify-center">

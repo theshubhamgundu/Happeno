@@ -221,10 +221,12 @@
 
             <div class="space-y-2">
               <label
+                for="merchant-category"
                 class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1"
                 >Category</label
               >
               <select
+                id="merchant-category"
                 bind:value={$profileStore.category}
                 class="w-full p-4 bg-bg-app rounded-xl font-bold text-sm outline-none border border-transparent focus:border-primary transition-colors text-text-primary"
               >
@@ -237,9 +239,9 @@
             </div>
 
             <div class="space-y-2">
-              <label
-                class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1"
-                >Type</label
+              <span
+                class="text-xs font-bold text-text-muted uppercase tracking-wider ml-1 block"
+                >Type</span
               >
               <div class="flex gap-2">
                 <button

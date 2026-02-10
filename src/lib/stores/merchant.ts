@@ -167,7 +167,26 @@ const initialProfile: MerchantProfile = {
     }
 };
 
+import type { Order, KitchenTicket, MerchantStats } from '$lib/types';
+import { mockOrders, mockKitchenTickets, getActiveOrders, getCompletedOrders } from '$lib/data/orders';
+
 export const menuItemsStore = writable<MenuItem[]>(initialMenuItems);
 export const activeOffersStore = writable<Offer[]>(initialOffers);
 export const pastOffersStore = writable<Offer[]>(initialPastOffers);
 export const profileStore = writable<MerchantProfile>(initialProfile);
+
+// Restored Stores for Kitchen and Order Management
+export const liveOrdersStore = writable<Order[]>(getActiveOrders());
+export const completedOrdersStore = writable<Order[]>(getCompletedOrders());
+export const kitchenTicketsStore = writable<KitchenTicket[]>(mockKitchenTickets);
+
+// Stats Store
+const initialStats: MerchantStats = {
+    liveOrders: getActiveOrders().length,
+    revenueToday: 12450,
+    activeTables: 8,
+    totalTables: 24,
+    avgPrepTime: 18
+};
+
+export const merchantStatsStore = writable<MerchantStats>(initialStats);

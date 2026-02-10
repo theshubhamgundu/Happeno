@@ -505,6 +505,10 @@
         <div
             class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80]"
             onclick={() => (showCartFloating = false)}
+            onkeydown={(e) => e.key === "Escape" && (showCartFloating = false)}
+            role="button"
+            tabindex="0"
+            aria-label="Close cart drawer"
             transition:fade
         ></div>
         <div
@@ -514,6 +518,7 @@
         >
             <button
                 onclick={() => (showCartFloating = false)}
+                aria-label="Drag down to close"
                 class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-gray-200 rounded-full"
             ></button>
 
