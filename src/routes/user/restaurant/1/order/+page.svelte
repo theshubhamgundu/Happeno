@@ -18,6 +18,7 @@
         Zap,
         Sparkles,
     } from "lucide-svelte";
+    import ChefPreparation from "$lib/components/restaurant/ChefPreparation.svelte";
 
     // Table info from URL
     const tableNumber = $derived($page.url.searchParams.get("table") || "4");
@@ -28,6 +29,7 @@
     let showCartFloating = $state(false);
     let orderStatus = $state("idle"); // idle, placing, confirmed, preparing, ready
     let waitingTime = $state(15); // minutes
+    let showChefPreparation = $state(false);
 
     const categories = [
         "Best Sellers",
@@ -149,11 +151,17 @@
 
     function placeOrder() {
         orderStatus = "placing";
+        showCartFloating = false;
+
+        // Simulate order confirmation
         setTimeout(() => {
             orderStatus = "confirmed";
+            showChefPreparation = true;
+            cart = []; // Clear cart on success
+
             setTimeout(() => {
                 orderStatus = "preparing";
-            }, 2000);
+            }, 3000);
         }, 1500);
     }
 </script>
@@ -308,6 +316,12 @@
             {/each}
         </div>
     </main>
+
+    <!-- Chef Preparation Animation -->
+    <ChefPreparation
+        show={showChefPreparation}
+        onClose={() => (showChefPreparation = false)}
+    />
 
     <!-- Floating Order Status -->
     {#if orderStatus !== "idle"}

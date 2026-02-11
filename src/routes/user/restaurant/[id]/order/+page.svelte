@@ -28,6 +28,7 @@
     import FloatingBillBar from "$lib/components/restaurant/FloatingBillBar.svelte";
     import MenuCard from "$lib/components/restaurant/MenuCard.svelte";
     import MenuCategoryBar from "$lib/components/restaurant/MenuCategoryBar.svelte";
+    import ChefPreparation from "$lib/components/restaurant/ChefPreparation.svelte";
 
     interface CartItem {
         id: number;
@@ -60,6 +61,7 @@
     let orderStatus = $state("idle"); // idle, placing, confirmed, preparing, ready
     let waitingTime = $state(15);
     let showSuccessScreen = $state(false);
+    let showChefPreparation = $state(false);
 
     const categories = [
         "Best Sellers",
@@ -185,42 +187,49 @@
         orderStatus = "placing";
         showCartFloating = false;
 
+        const currentRestaurantId = $page.params.id || "1";
         const newOrder: Order = {
-            id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-            restaurantId: $page.params.id,
+            id: "ORD-" + Math.random().toString(36).substr(2, 9).toUpperCase(),
+            restaurantId: currentRestaurantId,
             tableNumber: tableNumber,
-            items: cart.map(item => ({
+
+            items: cart.map((item) => ({
                 menuItemId: item.id,
                 name: item.name,
                 price: item.price,
-                quantity: item.qty
+                quantity: item.qty,
             })),
             subtotal: cartTotal,
             tax: Math.round(cartTotal * 0.05),
             serviceCharge: Math.round(cartTotal * 0.05),
             total: Math.round(cartTotal * 1.1),
-            status: 'pending',
-            paymentStatus: 'pending',
+            status: "pending",
+            paymentStatus: "pending",
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
         };
 
         const result = await dbService.placeOrder(newOrder);
 
         if (result.success) {
             orderStatus = "confirmed";
-            showSuccessScreen = true;
-            localStorage.setItem(`current_order_${$page.params.id}`, JSON.stringify(newOrder));
+            showCartFloating = false;
 
-            // Clear cart after success animation begins
+            // Show the Chef Preparation animation immediately for a premium feel
+            showChefPreparation = true;
+
+            localStorage.setItem(
+                `current_order_${$page.params.id}`,
+                JSON.stringify(newOrder),
+            );
+
+            // Clear cart
+            cart = [];
+
+            // Auto hide chef animation after 5 seconds or keep it for the preparing state
             setTimeout(() => {
-                cart = [];
-                // Auto hide success screen after 3 seconds
-                setTimeout(() => {
-                    showSuccessScreen = false;
-                    orderStatus = "preparing";
-                }, 3000);
-            }, 500);
+                orderStatus = "preparing";
+            }, 3000);
         }
     }
 </script>
@@ -290,11 +299,17 @@
     </main>
 
     <!-- Success Screen Overlay -->
-    <SuccessOverlay 
-        show={showSuccessScreen} 
-        {tableNumber} 
+    <SuccessOverlay
+        show={showSuccessScreen}
+        {tableNumber}
         restaurantId={$page.params.id}
-        onClose={() => showSuccessScreen = false}
+        onClose={() => (showSuccessScreen = false)}
+    />
+
+    <!-- Chef Preparation Animation -->
+    <ChefPreparation
+        show={showChefPreparation}
+        onClose={() => (showChefPreparation = false)}
     />
 
     <!-- Floating Order Status -->

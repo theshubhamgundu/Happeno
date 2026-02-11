@@ -131,25 +131,6 @@
                 {/if}
             </section>
         </main>
-
-        <!-- Floating Action Button -->
-        {#if isScrolled}
-            <div
-                class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50"
-                transition:fly={{ y: 50, duration: 400 }}
-            >
-                <a
-                    href="/user/restaurant/{restaurant.id}/order"
-                    class="bg-gray-900 text-white px-8 py-4 rounded-full flex items-center gap-3 shadow-2xl active:scale-95 transition-all"
-                >
-                    <UtensilsCrossed size={18} class="text-primary" />
-                    <span
-                        class="text-[10px] font-black uppercase tracking-[0.2em]"
-                        >ORDER NOW</span
-                    >
-                </a>
-            </div>
-        {/if}
     </div>
 {:else}
     <div class="min-h-screen flex items-center justify-center p-8 text-center">
