@@ -47,14 +47,10 @@
   async function handleCurrentLocation(silent = false) {
     if (!map) return;
     if (!silent) isLoadingLocation = true;
-    const minWait = silent
-      ? Promise.resolve()
-      : new Promise((r) => setTimeout(r, 1500));
 
     navigator.geolocation.getCurrentPosition(
       async (p) => {
         const { latitude, longitude } = p.coords;
-        await minWait;
         if (usingFallback) map.setView([latitude, longitude], 18);
         else map.setCenter([longitude, latitude]);
         isLoadingLocation = false;
@@ -172,37 +168,9 @@
 
   onMount(() => {
     if (browser) {
-      console.log("Onboarding: Looking for Ola Maps SDK...");
-      
-      // Safety Timeout: Don't let the user stay stuck on the loading screen
-      // If maps don't load in 3 seconds, unblock the UI and use fallback
-      const safetyTimeout = setTimeout(() => {
-        if (isLoadingLocation) {
-          console.warn("Maps taking too long, unblocking UI...");
-          isLoadingLocation = false;
-          if (!map && !usingFallback) triggerFallback();
-        }
-      }, 3000);
-
-      let attempts = 0;
-      const checkOla = setInterval(() => {
-        attempts++;
-        if (typeof OlaMaps !== "undefined") {
-          clearInterval(checkOla);
-          clearTimeout(safetyTimeout);
-          console.log("Ola Maps SDK found. Initializing...");
-          initOlaMaps();
-        }
-        if (attempts > 30) { // Reduced attempts (3 seconds total)
-          clearInterval(checkOla);
-          if (!map && !usingFallback) triggerFallback();
-        }
-      }, 100);
-
-      return () => {
-        clearInterval(checkOla);
-        clearTimeout(safetyTimeout);
-      };
+      console.log("Onboarding: Initializing JS Location Selection...");
+      isLoadingLocation = false;
+      initLeaflet();
     }
   });
 
